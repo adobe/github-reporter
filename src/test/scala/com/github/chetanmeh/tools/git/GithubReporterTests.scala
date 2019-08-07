@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.openwhisk.tools.github
+package com.github.chetanmeh.tools.git
+
 import org.junit.runner.RunWith
 import org.scalatest.{FlatSpec, Matchers}
 import org.scalatest.junit.JUnitRunner

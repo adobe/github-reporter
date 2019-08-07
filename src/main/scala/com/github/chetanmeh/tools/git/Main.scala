@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.openwhisk.tools.github
+package com.github.chetanmeh.tools.git
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 
