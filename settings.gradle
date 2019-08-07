@@ -18,7 +18,7 @@
  rootProject.name = 'github-reporter'
 
 gradle.ext.scala = [
-    version: '2.12.9',
+    version: '2.12.8',
     compileFlags: ['-feature', '-unchecked', '-deprecation', '-Xfatal-warnings', '-Ywarn-unused-import']
 ]
 
