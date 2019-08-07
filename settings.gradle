@@ -22,9 +22,6 @@ gradle.ext.scala = [
     compileFlags: ['-feature', '-unchecked', '-deprecation', '-Xfatal-warnings', '-Ywarn-unused-import']
 ]
 
-gradle.ext.akka = [version : '2.5.21']
-gradle.ext.akka_http = [version : '10.1.7']
-
 gradle.ext.scalafmt = [
     config: new File(rootProject.projectDir, '.scalafmt.conf')
 ]
