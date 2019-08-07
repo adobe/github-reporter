@@ -17,15 +17,28 @@
 
 package com.github.chetanmeh.tools
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
 import javax.json.JsonObject
 
 package object git {
-  case class Issue(creator: String, id: Int, title: String)
+  case class Issue(creator: String, id: Int, title: String, isNew: Boolean, open: Boolean) {
+    def isNewlyCreate: Boolean = isNew && open
+    def isUpdate: Boolean = !isNew && open
+    def isClosed: Boolean = !open
+  }
 
   object Issue {
-    def apply(json: JsonObject): Issue = {
+    def apply(json: JsonObject, since: LocalDate): Issue = {
       // https://developer.github.com/v3/pulls/#get-a-single-pull-request
-      Issue(json.getJsonObject("user").getString("login"), json.getInt("number"), json.getString("title"))
+      val createdAt = asDate(json.getString("created_at"))
+      Issue(
+        json.getJsonObject("user").getString("login"),
+        json.getInt("number"),
+        json.getString("title"),
+        createdAt.isAfter(since.minusDays(1)),
+        json.getString("state") == "open")
     }
   }
 
@@ -39,4 +52,8 @@ package object git {
   }
 
   case class RepoReport(name: String, issues: List[Issue], pulls: List[PullRequest])
+
+  private def asDate(str: String): LocalDate = {
+    DateTimeFormatter.ISO_DATE_TIME.parse(str, LocalDate.from _)
+  }
 }

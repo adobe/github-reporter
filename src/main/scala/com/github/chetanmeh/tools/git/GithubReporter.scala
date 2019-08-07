@@ -44,9 +44,9 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     val pulls = mutable.ListBuffer.empty[PullRequest]
     issueItr.foreach { json =>
       if (isPull(json)) {
-        pulls += PullRequest(getPull(json, repo))
+        //pulls += PullRequest(getPull(json, repo))
       } else {
-        issues += Issue(json)
+        issues += Issue(json, since)
       }
     }
     RepoReport(repoName, issues.toList, pulls.toList)
