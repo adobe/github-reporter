@@ -1,1 +1,19 @@
-Hello
+<%@ val repo: com.github.chetanmeh.tools.git.RepoReport %>
+<%
+    val H = "#"
+%>
+${H} ${repo.name}
+#if (repo.issues.nonEmpty)
+${H}${H} Issues
+<%
+    val newOpenIssues = repo.issues.filter(_.isNewlyOpened)
+    val closedIssues = repo.issues.filter(_.isClosed)
+    val updatedIssues = repo.issues.filter(_.isUpdate)
+%>
+#if (newOpenIssues.nonEmpty)
+${H}${H}${H} Created:
+#for (i <- newOpenIssues)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
+#end

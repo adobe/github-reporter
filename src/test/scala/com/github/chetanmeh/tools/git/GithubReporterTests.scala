@@ -48,6 +48,8 @@ class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
         Issue("chetanmeh", 4576, "Update to Scala 2.12.9", true, true)),
       List.empty)
     val o = reportRenderer.render(r)
+    println("-------")
     println(o)
+    println("-------")
   }
 }

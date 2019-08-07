@@ -24,7 +24,7 @@ import javax.json.JsonObject
 
 package object git {
   case class Issue(creator: String, id: Int, title: String, isNew: Boolean, open: Boolean) {
-    def isNewlyCreate: Boolean = isNew && open
+    def isNewlyOpened: Boolean = isNew && open
     def isUpdate: Boolean = !isNew && open
     def isClosed: Boolean = !open
   }
@@ -51,7 +51,13 @@ package object git {
     }
   }
 
-  case class RepoReport(name: String, issues: List[Issue], pulls: List[PullRequest])
+  case class RepoReport(name: String, issues: List[Issue], pulls: List[PullRequest]) {
+    def notEmpty: Boolean = issues.nonEmpty || pulls.nonEmpty
+
+    def newOpenIssues: List[Issue] = issues.filter(_.isNewlyOpened)
+    def closedIssues: List[Issue] = issues.filter(_.isClosed)
+    def updatedIssues: List[Issue] = issues.filter(_.isUpdate)
+  }
 
   private def asDate(str: String): LocalDate = {
     DateTimeFormatter.ISO_DATE_TIME.parse(str, LocalDate.from _)
