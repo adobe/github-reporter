@@ -18,6 +18,7 @@
 package com.github.chetanmeh.tools
 
 import com.jcabi.github.{Pull, Issue => JIssue}
+import javax.json.JsonObject
 
 package object git {
   case class Issue(creator: String, id: Int, title: String)
@@ -26,6 +27,11 @@ package object git {
     def apply(i: JIssue.Smart): Issue = {
       Issue(i.author().login(), i.number(), i.title())
     }
+
+    def apply(json: JsonObject): Issue = {
+      // https://developer.github.com/v3/pulls/#get-a-single-pull-request
+      Issue(json.getJsonObject("user").getString("login"), json.getInt("number"), json.getString("title"))
+    }
   }
 
   case class PullRequest(creator: String, id: Int, title: String)
@@ -33,6 +39,11 @@ package object git {
   object PullRequest {
     def apply(p: Pull.Smart): PullRequest = {
       PullRequest(p.author().login(), p.number(), p.title())
+    }
+
+    def apply(json: JsonObject): PullRequest = {
+      // https://developer.github.com/v3/pulls/#get-a-single-pull-request
+      PullRequest(json.getJsonObject("user").getString("login"), json.getInt("number"), json.getString("title"))
     }
   }
 

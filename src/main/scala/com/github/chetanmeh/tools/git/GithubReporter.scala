@@ -19,13 +19,11 @@ package com.github.chetanmeh.tools.git
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util
 
-import com.jcabi.github.Issues.{Qualifier, Sort}
-import com.jcabi.github.Search.Order
-import com.jcabi.github.{Coordinates, Github, Pull, RtGithub, Issue => JIssue}
+import com.jcabi.github.{Coordinates, Github, Repo, RtGithub, RtPagination}
 import com.jcabi.http.wire.RetryWire
 import com.typesafe.config.{Config, ConfigFactory}
+import javax.json.JsonObject
 import pureconfig.generic.auto._
 import pureconfig.loadConfigOrThrow
 
@@ -35,24 +33,51 @@ import scala.collection.mutable
 case class GithubConfig(accessToken: String)
 
 case class GithubReporter(github: Github, config: GithubConfig) {
-  def generateReport(repoName: String, since: LocalDate): RepoReport = {
-    val repo = github.repos().get(new Coordinates.Simple(repoName))
 
-    val criteria = Map(Qualifier.STATE -> "all", Qualifier.SINCE -> since.format(DateTimeFormatter.ISO_DATE))
-    val issueItr = repo.issues().search(Sort.UPDATED, Order.DESC, new util.EnumMap(criteria.asJava))
+  def generateReport(repoName: String, since: LocalDate): RepoReport = {
+    val coords = new Coordinates.Simple(repoName)
+    val repo = github.repos().get(coords)
+
+    val issueItr = issuePaginator(coords, since)
 
     val issues = mutable.ListBuffer.empty[Issue]
     val pulls = mutable.ListBuffer.empty[PullRequest]
-    issueItr.asScala.foreach { i =>
-      val si = new JIssue.Smart(i)
-      if (si.isPull) {
-        val p = new Pull.Smart(si.pull())
-        pulls += PullRequest(p)
+    issueItr.foreach { json =>
+      if (isPull(json)) {
+        pulls += PullRequest(getPull(json, repo))
       } else {
-        issues += Issue(si)
+        issues += Issue(json)
       }
     }
     RepoReport(repoName, issues.toList, pulls.toList)
+  }
+
+  private def isPull(issueJson: JsonObject): Boolean = issueJson.containsKey("pull_request")
+
+  private def getPull(issueJson: JsonObject, repo: Repo): JsonObject = {
+    val uri = issueJson.getJsonObject("pull_request").getString("html_url")
+    val prId = uri.substring(uri.lastIndexOf("/") + 1).toInt
+    repo.pulls().get(prId).json()
+  }
+
+  private def issuePaginator(coords: Coordinates, since: LocalDate) = {
+    val request = github
+      .entry()
+      .uri()
+      .path("/repos")
+      .path(coords.user())
+      .path(coords.repo())
+      .path("/issues")
+      .back()
+
+    val params = Map(
+      "sort" -> "updated",
+      "direction" -> "desc",
+      "state" -> "all",
+      "since" -> since.format(DateTimeFormatter.ISO_DATE))
+
+    val p = new RtPagination[JsonObject](request.uri.queryParams(params.asJava).back, x => x)
+    p.asScala
   }
 
 }
