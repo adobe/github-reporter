@@ -15,21 +15,26 @@
  * limitations under the License.
  */
 
-package com.github.chetanmeh.tools.git
+package com.github.chetanmeh.tools
 
-import java.time.LocalDate
+import com.jcabi.github.{Pull, Issue => JIssue}
 
-import org.junit.runner.RunWith
-import org.scalatest.{FlatSpec, Matchers}
-import org.scalatest.junit.JUnitRunner
+package object git {
+  case class Issue(creator: String, id: Int, title: String)
 
-@RunWith(classOf[JUnitRunner])
-class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
-  behavior of "Reporter"
-
-  val reporter = GithubReporter()
-
-  it should "get repo info" in {
-    println(reporter.generateReport("apache/openwhisk", LocalDate.parse("2019-08-01")))
+  object Issue {
+    def apply(i: JIssue.Smart): Issue = {
+      Issue(i.author().login(), i.number(), i.title())
+    }
   }
+
+  case class PullRequest(creator: String, id: Int, title: String)
+
+  object PullRequest {
+    def apply(p: Pull.Smart): PullRequest = {
+      PullRequest(p.author().login(), p.number(), p.title())
+    }
+  }
+
+  case class RepoReport(name: String, issues: List[Issue], pulls: List[PullRequest])
 }

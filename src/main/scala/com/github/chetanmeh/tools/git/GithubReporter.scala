@@ -17,18 +17,42 @@
 
 package com.github.chetanmeh.tools.git
 
-import com.jcabi.github.{Coordinates, Github, RtGithub}
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util
+
+import com.jcabi.github.Issues.{Qualifier, Sort}
+import com.jcabi.github.Search.Order
+import com.jcabi.github.{Coordinates, Github, Pull, RtGithub, Issue => JIssue}
 import com.jcabi.http.wire.RetryWire
 import com.typesafe.config.{Config, ConfigFactory}
 import pureconfig.generic.auto._
 import pureconfig.loadConfigOrThrow
 
+import scala.collection.JavaConverters._
+import scala.collection.mutable
+
 case class GithubConfig(accessToken: String)
 
 case class GithubReporter(github: Github, config: GithubConfig) {
-  def generateReport(repoName: String): String = {
+  def generateReport(repoName: String, since: LocalDate): RepoReport = {
     val repo = github.repos().get(new Coordinates.Simple(repoName))
-    repo.toString
+
+    val criteria = Map(Qualifier.STATE -> "all", Qualifier.SINCE -> since.format(DateTimeFormatter.ISO_DATE))
+    val issueItr = repo.issues().search(Sort.UPDATED, Order.DESC, new util.EnumMap(criteria.asJava))
+
+    val issues = mutable.ListBuffer.empty[Issue]
+    val pulls = mutable.ListBuffer.empty[PullRequest]
+    issueItr.asScala.foreach { i =>
+      val si = new JIssue.Smart(i)
+      if (si.isPull) {
+        val p = new Pull.Smart(si.pull())
+        pulls += PullRequest(p)
+      } else {
+        issues += Issue(si)
+      }
+    }
+    RepoReport(repoName, issues.toList, pulls.toList)
   }
 
 }
@@ -46,5 +70,4 @@ object GithubReporter {
 
 object ConfigKeys {
   val github = "reporter.github"
-
 }
