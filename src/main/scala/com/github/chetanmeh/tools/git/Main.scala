@@ -16,22 +16,8 @@
  */
 package com.github.chetanmeh.tools.git
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-
-import scala.concurrent.{Await, ExecutionContext}
-import scala.concurrent.duration._
-
 object Main extends App {
-  implicit val system: ActorSystem = ActorSystem("github-system")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val ec: ExecutionContext = system.dispatcher
 
-  val reporter = new GithubReporter()
-  val f = reporter.generateReport()
-  f.foreach(println)
-  f.onComplete { _ =>
-    system.terminate()
-    Await.result(system.whenTerminated, 30.seconds)
-  }
+  val reporter = GithubReporter()
+
 }

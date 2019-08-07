@@ -17,21 +17,34 @@
 
 package com.github.chetanmeh.tools.git
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import com.jcabi.github.{Coordinates, Github, RtGithub}
+import com.jcabi.http.wire.RetryWire
+import com.typesafe.config.{Config, ConfigFactory}
+import pureconfig.generic.auto._
+import pureconfig.loadConfigOrThrow
 
-import scala.concurrent.{ExecutionContext, Future}
-import pureconfig._
+case class GithubConfig(accessToken: String)
 
-class GithubReporter()(implicit system: ActorSystem, materializer: ActorMaterializer) {
-  private val config = system.settings.config
-  private implicit val executionContext: ExecutionContext = system.dispatcher
-  private val api = new GithubApi(loadConfigOrThrow[GithubConfig](config, Config.github))
-
-  def generateReport(): Future[String] = api.getRepos().map(_.toString())
+case class GithubReporter(github: Github, config: GithubConfig) {
+  def generateReport(repoName: String): String = {
+    val repo = github.repos().get(new Coordinates.Simple(repoName))
+    repo.toString
+  }
 
 }
 
-object Config {
+object GithubReporter {
+
+  def apply(): GithubReporter = apply(ConfigFactory.load())
+
+  def apply(globalConfig: Config): GithubReporter = {
+    val config = loadConfigOrThrow[GithubConfig](globalConfig.getConfig(ConfigKeys.github))
+    val github = new RtGithub(new RtGithub(config.accessToken).entry().through(classOf[RetryWire]))
+    new GithubReporter(github, config)
+  }
+}
+
+object ConfigKeys {
   val github = "reporter.github"
+
 }

@@ -18,8 +18,7 @@
 package com.github.chetanmeh.tools.git
 
 import org.scalatest.Suite
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 
-trait ReporterTestBase extends WskActorSystem with ScalaFutures with IntegrationPatience {
+trait ReporterTestBase {
   self: Suite =>
 }
