@@ -32,4 +32,22 @@ class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
   it should "get repo info" in {
     println(reporter.generateReport("apache/openwhisk", LocalDate.parse("2019-08-01")))
   }
+
+  it should "render" in {
+    val reportRenderer = new ReportRenderer()
+    val r = RepoReport(
+      "openwhisk",
+      List(
+        Issue("SungHoHong2", 4577, "Feature request: Checkpoint for recovering failed actions", true, false),
+        Issue(
+          "steven0711dong",
+          4574,
+          "Update cache-invalidator build.gradle file to resolve bluemix-openwhiskl-cli build issue. ",
+          true,
+          false),
+        Issue("chetanmeh", 4576, "Update to Scala 2.12.9", true, true)),
+      List.empty)
+    val o = reportRenderer.render(r)
+    println(o)
+  }
 }
