@@ -16,4 +16,16 @@ ${H}${H}${H} Created:
     * ${H}${i.id.toString} - ${i.title} (${i.creator})
 #end
 #end
+#if (closedIssues.nonEmpty)
+${H}${H}${H} Closed:
+#for (i <- closedIssues)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
+#if (updatedIssues.nonEmpty)
+${H}${H}${H} Updated:
+#for (i <- updatedIssues)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
 #end
