@@ -18,14 +18,14 @@
 plugins {
     id 'scala'
     id 'application'
-    id "org.scoverage" version "2.5.0"
-    id "com.gradle.build-scan" version "1.14"
+    id "org.scoverage" version "3.1.5"
+    id "com.gradle.build-scan" version "2.3"
     id "cz.alenkacz.gradle.scalafmt" version "1.5.1"
-    id 'org.springframework.boot' version '2.0.2.RELEASE'
+    id 'org.springframework.boot' version '2.1.7.RELEASE'
 }
 
 
-group 'org.apache.openwhisk.tools.github'
+group 'com.github.chetanmeh.tools.git'
 version '1.0-SNAPSHOT'
 scalafmt.configFilePath = gradle.scalafmt.config
 project.archivesBaseName = "github-reporter"
@@ -60,7 +60,7 @@ dependencies {
     compile 'org.slf4j:jcl-over-slf4j:1.7.25'
     compile 'org.slf4j:log4j-over-slf4j:1.7.25'
 
-    compile 'org.rogach:scallop_2.12:3.2.0'
+    compile 'org.rogach:scallop_2.12:3.3.1'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.scalatest:scalatest_2.12:3.0.3'
@@ -68,7 +68,6 @@ dependencies {
     testCompile "com.typesafe.akka:akka-stream-testkit_2.12:${gradle.akka.version}"
     testCompile "com.typesafe.akka:akka-http-testkit_2.12:${gradle.akka_http.version}"
 
-    scoverage 'org.scoverage:scalac-scoverage-plugin_2.12:1.4.0-M4', 'org.scoverage:scalac-scoverage-runtime_2.12:1.4.0-M4'
 }
 
 tasks.withType(ScalaCompile) {
@@ -76,7 +75,7 @@ tasks.withType(ScalaCompile) {
 }
 
 bootJar {
-    mainClassName = 'org.apache.openwhisk.tools.github.Main'
+    mainClassName = 'com.github.chetanmeh.tools.git.Main'
 }
 
 tasks.withType(Test) {
