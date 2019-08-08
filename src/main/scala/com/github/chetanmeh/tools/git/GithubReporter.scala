@@ -44,12 +44,17 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     val pulls = mutable.ListBuffer.empty[PullRequest]
     issueItr.foreach { json =>
       if (isPull(json)) {
-        //pulls += PullRequest(getPull(json, repo))
+        pulls += PullRequest(getPull(json, repo), since)
       } else {
         issues += Issue(json, since)
       }
     }
     RepoReport(repoName, issues.toList, pulls.toList)
+  }
+
+  def generateReport(repoNames: Seq[String], since: LocalDate): Seq[RepoReport] = {
+    //Include only reports from repo which had any change
+    repoNames.map(r => generateReport(r, since)).filter(_.notEmpty).sortBy(_.name)
   }
 
   private def isPull(issueJson: JsonObject): Boolean = issueJson.containsKey("pull_request")

@@ -30,4 +30,8 @@ class ReportRenderer(template: String = "repo-report.ssp") {
   def render(report: RepoReport): String = {
     engine.layout(source, Map("repo" -> report))
   }
+
+  def render(reports: Seq[RepoReport]): String = {
+    reports.map(render).mkString("\n")
+  }
 }

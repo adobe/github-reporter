@@ -29,3 +29,36 @@ ${H}${H}${H} Updated:
 #end
 #end
 #end
+#if (repo.pulls.nonEmpty)
+${H}${H} Pull Requests
+<%
+    val newOpenPRs = repo.pulls.filter(_.isNewlyOpened)
+    val closedPRs = repo.pulls.filter(_.isClosed)
+    val updatedPRs = repo.pulls.filter(_.isUpdate)
+    val mergedPRs = repo.pulls.filter(_.isMerged)
+%>
+#if (mergedPRs.nonEmpty)
+${H}${H}${H} Merged:
+#for (i <- mergedPRs)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
+#if (newOpenPRs.nonEmpty)
+${H}${H}${H} Created:
+#for (i <- newOpenPRs)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
+#if (closedPRs.nonEmpty)
+${H}${H}${H} Closed:
+#for (i <- closedPRs)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
+#if (updatedPRs.nonEmpty)
+${H}${H}${H} Updated:
+#for (i <- updatedPRs)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
+#end

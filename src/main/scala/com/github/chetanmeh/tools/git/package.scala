@@ -42,21 +42,29 @@ package object git {
     }
   }
 
-  case class PullRequest(creator: String, id: Int, title: String)
+  case class PullRequest(creator: String, id: Int, title: String, isNew: Boolean, open: Boolean, merged: Boolean) {
+    def isNewlyOpened: Boolean = isNew && open
+    def isUpdate: Boolean = !isNew && open
+    def isClosed: Boolean = !open && !merged
+    def isMerged: Boolean = merged
+  }
 
   object PullRequest {
-    def apply(json: JsonObject): PullRequest = {
+    def apply(json: JsonObject, since: LocalDate): PullRequest = {
       // https://developer.github.com/v3/pulls/#get-a-single-pull-request
-      PullRequest(json.getJsonObject("user").getString("login"), json.getInt("number"), json.getString("title"))
+      val createdAt = asDate(json.getString("created_at"))
+      PullRequest(
+        json.getJsonObject("user").getString("login"),
+        json.getInt("number"),
+        json.getString("title"),
+        createdAt.isAfter(since.minusDays(1)),
+        json.getString("state") == "open",
+        json.getBoolean("merged"))
     }
   }
 
   case class RepoReport(name: String, issues: List[Issue], pulls: List[PullRequest]) {
     def notEmpty: Boolean = issues.nonEmpty || pulls.nonEmpty
-
-    def newOpenIssues: List[Issue] = issues.filter(_.isNewlyOpened)
-    def closedIssues: List[Issue] = issues.filter(_.isClosed)
-    def updatedIssues: List[Issue] = issues.filter(_.isUpdate)
   }
 
   private def asDate(str: String): LocalDate = {
