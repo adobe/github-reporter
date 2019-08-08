@@ -31,14 +31,8 @@ package object git {
 
   object Issue {
     def apply(json: JsonObject, since: LocalDate): Issue = {
-      // https://developer.github.com/v3/pulls/#get-a-single-pull-request
-      val createdAt = asDate(json.getString("created_at"))
-      Issue(
-        json.getJsonObject("user").getString("login"),
-        json.getInt("number"),
-        json.getString("title"),
-        createdAt.isAfter(since.minusDays(1)),
-        json.getString("state") == "open")
+      val c = CommonAttr(json, since)
+      Issue(c.creator, c.id, c.title, c.isNew, c.open)
     }
   }
 
@@ -51,15 +45,8 @@ package object git {
 
   object PullRequest {
     def apply(json: JsonObject, since: LocalDate): PullRequest = {
-      // https://developer.github.com/v3/pulls/#get-a-single-pull-request
-      val createdAt = asDate(json.getString("created_at"))
-      PullRequest(
-        json.getJsonObject("user").getString("login"),
-        json.getInt("number"),
-        json.getString("title"),
-        createdAt.isAfter(since.minusDays(1)),
-        json.getString("state") == "open",
-        json.getBoolean("merged"))
+      val c = CommonAttr(json, since)
+      PullRequest(c.creator, c.id, c.title, c.isNew, c.open, json.getBoolean("merged"))
     }
   }
 
@@ -69,5 +56,20 @@ package object git {
 
   private def asDate(str: String): LocalDate = {
     DateTimeFormatter.ISO_DATE_TIME.parse(str, LocalDate.from _)
+  }
+
+  case class CommonAttr(creator: String, id: Int, title: String, isNew: Boolean, open: Boolean)
+
+  object CommonAttr {
+    def apply(json: JsonObject, since: LocalDate): CommonAttr = {
+      // https://developer.github.com/v3/issues/#list-issues-for-a-repository
+      val createdAt = asDate(json.getString("created_at"))
+      CommonAttr(
+        json.getJsonObject("user").getString("login"),
+        json.getInt("number"),
+        json.getString("title"),
+        createdAt.isAfter(since.minusDays(1)),
+        json.getString("state") == "open")
+    }
   }
 }
