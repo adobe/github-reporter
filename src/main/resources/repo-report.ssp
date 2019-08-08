@@ -1,16 +1,17 @@
 <%@ val repo: com.github.chetanmeh.tools.git.RepoReport %>
 <%
-    val H = "#"
+    val H1 = "#"
+    val H2 = "#" * 2
 %>
-${H} ${repo.name}
+${H1} ${repo.name}
 #if (repo.issues.nonEmpty)
-${H}${H} Issues
+${H2} Issues
 <% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isNewlyOpened), "heading" -> "Created"))%>
 <% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isClosed), "heading" -> "Closed"))%>
 <% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isUpdate), "heading" -> "Updated"))%>
 #end
 #if (repo.pulls.nonEmpty)
-${H}${H} Pull Requests
+${H2} Pull Requests
 <% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isMerged), "heading" -> "Merged"))%>
 <% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isNewlyOpened), "heading" -> "Created"))%>
 <% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isClosed), "heading" -> "Closed"))%>

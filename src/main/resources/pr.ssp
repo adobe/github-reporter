@@ -1,9 +1,12 @@
 <%@ val pulls: Seq[com.github.chetanmeh.tools.git.PullRequest] %>
 <%@ val heading: String %>
-<% val H = "#" %>
+<%
+    val H1 = "#"
+    val H3 = "#" * 3
+%>
 #if (pulls.nonEmpty)
-${H}${H}${H} ${heading}:
+${H3} ${heading}:
 #for (i <- pulls)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+    * ${H1}${i.id.toString} - ${i.title} (${i.creator})
 #end
 #end
