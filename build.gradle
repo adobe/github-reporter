@@ -17,7 +17,6 @@
 
 plugins {
     id 'scala'
-    id 'application'
     id "org.scoverage" version "3.1.5"
     id "com.gradle.build-scan" version "2.3"
     id "cz.alenkacz.gradle.scalafmt" version "1.5.1"
