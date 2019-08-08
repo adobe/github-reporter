@@ -5,60 +5,14 @@
 ${H} ${repo.name}
 #if (repo.issues.nonEmpty)
 ${H}${H} Issues
-<%
-    val newOpenIssues = repo.issues.filter(_.isNewlyOpened)
-    val closedIssues = repo.issues.filter(_.isClosed)
-    val updatedIssues = repo.issues.filter(_.isUpdate)
-%>
-#if (newOpenIssues.nonEmpty)
-${H}${H}${H} Created:
-#for (i <- newOpenIssues)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
-#end
-#end
-#if (closedIssues.nonEmpty)
-${H}${H}${H} Closed:
-#for (i <- closedIssues)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
-#end
-#end
-#if (updatedIssues.nonEmpty)
-${H}${H}${H} Updated:
-#for (i <- updatedIssues)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
-#end
-#end
+<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isNewlyOpened), "heading" -> "Created"))%>
+<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isClosed), "heading" -> "Closed"))%>
+<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isUpdate), "heading" -> "Updated"))%>
 #end
 #if (repo.pulls.nonEmpty)
 ${H}${H} Pull Requests
-<%
-    val newOpenPRs = repo.pulls.filter(_.isNewlyOpened)
-    val closedPRs = repo.pulls.filter(_.isClosed)
-    val updatedPRs = repo.pulls.filter(_.isUpdate)
-    val mergedPRs = repo.pulls.filter(_.isMerged)
-%>
-#if (mergedPRs.nonEmpty)
-${H}${H}${H} Merged:
-#for (i <- mergedPRs)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
-#end
-#end
-#if (newOpenPRs.nonEmpty)
-${H}${H}${H} Created:
-#for (i <- newOpenPRs)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
-#end
-#end
-#if (closedPRs.nonEmpty)
-${H}${H}${H} Closed:
-#for (i <- closedPRs)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
-#end
-#end
-#if (updatedPRs.nonEmpty)
-${H}${H}${H} Updated:
-#for (i <- updatedPRs)
-    * ${H}${i.id.toString} - ${i.title} (${i.creator})
-#end
-#end
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isMerged), "heading" -> "Merged"))%>
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isNewlyOpened), "heading" -> "Created"))%>
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isClosed), "heading" -> "Closed"))%>
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isUpdate), "heading" -> "Updated"))%>
 #end

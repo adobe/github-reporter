@@ -1,0 +1,9 @@
+<%@ val issues: Seq[com.github.chetanmeh.tools.git.Issue] %>
+<%@ val heading: String %>
+<% val H = "#" %>
+#if (issues.nonEmpty)
+${H}${H}${H} ${heading}:
+#for (i <- issues)
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
+#end
+#end
