@@ -22,16 +22,28 @@ import java.nio.charset.StandardCharsets.UTF_8
 import org.apache.commons.io.IOUtils
 import org.fusesource.scalate._
 import org.fusesource.scalate.support.StringTemplateSource
+import org.fusesource.scalate.util.{Resource, ResourceLoader}
 
 class ReportRenderer(template: String = "repo-report.ssp") {
-  private val engine = new TemplateEngine
-  private val source = new StringTemplateSource(template, IOUtils.resourceToString("/" + template, UTF_8))
+  private val engine = {
+    val e = new TemplateEngine
+    e.resourceLoader = ClassPathResourceLoader
+    e.allowReload = false
+    e
+  }
 
   def render(report: RepoReport): String = {
-    engine.layout(source, Map("repo" -> report))
+    engine.layout(template, Map("repo" -> report))
   }
 
   def render(reports: Seq[RepoReport]): String = {
     reports.map(render).mkString("\n")
+  }
+}
+
+object ClassPathResourceLoader extends ResourceLoader {
+  override def resource(uri: String): Option[Resource] = {
+    val text = IOUtils.resourceToString("/" + uri, UTF_8)
+    Some(new StringTemplateSource(uri, text))
   }
 }
