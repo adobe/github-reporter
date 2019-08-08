@@ -22,10 +22,7 @@ import java.time.format.DateTimeFormatter
 
 import com.jcabi.github.{Coordinates, Github, Repo, RtGithub, RtPagination}
 import com.jcabi.http.wire.RetryWire
-import com.typesafe.config.{Config, ConfigFactory}
 import javax.json.JsonObject
-import pureconfig.generic.auto._
-import pureconfig.loadConfigOrThrow
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -88,20 +85,12 @@ case class GithubReporter(github: Github, config: GithubConfig) {
 }
 
 object GithubReporter {
-
-  def apply(): GithubReporter = apply(ConfigFactory.load())
-
-  def apply(globalConfig: Config): GithubReporter = {
-    val config = loadConfigOrThrow[GithubConfig](globalConfig.getConfig(ConfigKeys.github))
-    new GithubReporter(createGithub(config), config)
+  def apply(config: GithubConfig): GithubReporter = {
+    GithubReporter(createGithub(config), config)
   }
 
   def createGithub(config: GithubConfig): Github = {
     val base = config.accessToken.map(new RtGithub(_)).getOrElse(new RtGithub())
     new RtGithub(base.entry().through(classOf[RetryWire]))
   }
-}
-
-object ConfigKeys {
-  val github = "reporter.github"
 }

@@ -31,7 +31,8 @@ import org.scalatest.junit.JUnitRunner
 class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
   behavior of "Reporter"
 
-  val reporter = GithubReporter()
+  val token = sys.env("GITHUB_TOKEN")
+  val reporter = GithubReporter(GithubConfig(Some(token)))
   val repos = List(
     "apache/openwhisk",
     "apache/openwhisk-website",

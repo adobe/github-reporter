@@ -51,8 +51,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val w = Stopwatch.createStarted()
     val conf = new Conf(args)
-    val config = GithubConfig(conf.token.toOption)
-    val reporter = GithubReporter(GithubReporter.createGithub(config), config)
+    val reporter = GithubReporter(GithubConfig(conf.token.toOption))
     val reports = reporter.generateReport(conf.repoNames(), conf.since())
 
     val reportRenderer = new ReportRenderer()

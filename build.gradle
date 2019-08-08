@@ -49,7 +49,6 @@ buildScan {
 
 dependencies {
     compile "org.scala-lang:scala-library:${gradle.scala.version}"
-    compile ('com.github.pureconfig:pureconfig_2.12:0.11.1')
     compile 'com.jcabi:jcabi-github:0.41'
     compile 'javax.json:javax.json-api:1.0'
 
