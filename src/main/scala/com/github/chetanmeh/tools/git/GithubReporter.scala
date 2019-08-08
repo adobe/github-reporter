@@ -30,7 +30,7 @@ import pureconfig.loadConfigOrThrow
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-case class GithubConfig(accessToken: String)
+case class GithubConfig(accessToken: Option[String])
 
 case class GithubReporter(github: Github, config: GithubConfig) {
 
@@ -93,8 +93,12 @@ object GithubReporter {
 
   def apply(globalConfig: Config): GithubReporter = {
     val config = loadConfigOrThrow[GithubConfig](globalConfig.getConfig(ConfigKeys.github))
-    val github = new RtGithub(new RtGithub(config.accessToken).entry().through(classOf[RetryWire]))
-    new GithubReporter(github, config)
+    new GithubReporter(createGithub(config), config)
+  }
+
+  def createGithub(config: GithubConfig): Github = {
+    val base = config.accessToken.map(new RtGithub(_)).getOrElse(new RtGithub())
+    new RtGithub(base.entry().through(classOf[RetryWire]))
   }
 }
 
