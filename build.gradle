@@ -51,6 +51,7 @@ dependencies {
     compile "org.scala-lang:scala-library:${gradle.scala.version}"
     compile 'com.jcabi:jcabi-github:0.41'
     compile 'javax.json:javax.json-api:1.0'
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
 
     compile 'org.scalatra.scalate:scalate-core_2.12:1.9.4'
     compile 'commons-io:commons-io:2.6'

@@ -20,14 +20,17 @@ package com.github.chetanmeh.tools.git
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-import com.jcabi.github.{Coordinates, Github, Repo, RtGithub, RtPagination}
-import com.jcabi.http.wire.RetryWire
+import com.jcabi.github.{Coordinates, FromProperties, Github, Repo, RtGithub, RtPagination}
+import com.jcabi.http.Request
+import com.jcabi.http.request.ApacheRequest
+import com.jcabi.http.wire.{AutoRedirectingWire, RetryWire}
 import javax.json.JsonObject
+import javax.ws.rs.core.{HttpHeaders, MediaType}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-case class GithubConfig(accessToken: Option[String])
+case class GithubConfig(accessToken: Option[String], uri: String = "https://api.github.com")
 
 case class GithubReporter(github: Github, config: GithubConfig) {
 
@@ -81,7 +84,6 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     val p = new RtPagination[JsonObject](request.uri.queryParams(params.asJava).back, x => x)
     p.asScala
   }
-
 }
 
 object GithubReporter {
@@ -90,7 +92,20 @@ object GithubReporter {
   }
 
   def createGithub(config: GithubConfig): Github = {
-    val base = config.accessToken.map(new RtGithub(_)).getOrElse(new RtGithub())
+    val req = createRequest(config.uri)
+    val reqWithToken = config.accessToken.map(authenticatedRequest(req, _)).getOrElse(req)
+    val base = new RtGithub(reqWithToken)
     new RtGithub(base.entry().through(classOf[RetryWire]))
   }
+
+  private def createRequest(uri: String) = {
+    new ApacheRequest(uri)
+      .header(HttpHeaders.USER_AGENT, new FromProperties("jcabigithub.properties").format)
+      .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
+      .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
+      .through(classOf[AutoRedirectingWire])
+  }
+
+  private def authenticatedRequest(req: Request, token: String) =
+    req.header(HttpHeaders.AUTHORIZATION, s"token $token")
 }

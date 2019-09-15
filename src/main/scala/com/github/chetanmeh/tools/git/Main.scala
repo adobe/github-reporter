@@ -43,6 +43,8 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
       required = false,
       default = Some(List.empty))
 
+  val uri = opt[String](descr = "Github server uri", default = Some("https://api.github.com"))
+
   verify()
 }
 
@@ -51,7 +53,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val w = Stopwatch.createStarted()
     val conf = new Conf(args)
-    val reporter = GithubReporter(GithubConfig(conf.token.toOption))
+    val reporter = GithubReporter(GithubConfig(conf.token.toOption, conf.uri()))
     val reports = reporter.generateReport(conf.repoNames(), conf.since())
 
     val reportRenderer = new ReportRenderer()
