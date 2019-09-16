@@ -7,6 +7,8 @@ overview of work being done across multiple repositories.
 $ java -jar github-reporter.jar --since "2 days" apache/openwhisk 
 ```
 
+Download the current snapshot release from [here][1]
+
 The generated report looks like below
 
 ```markdown
@@ -72,3 +74,5 @@ $ java -jar build/libs/github-reporter-1.0-SNAPSHOT.jar -h
 
 Github change reporter
 ```
+
+[1]: https://git.corp.adobe.com/chetanm/github-reporter/releases/download/SNAPSHOT/github-reporter-1.0-SNAPSHOT.jar
