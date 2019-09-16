@@ -24,9 +24,10 @@ import java.util.Base64
 
 import org.apache.commons.io.FileUtils
 import org.junit.runner.RunWith
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.{FlatSpec, Ignore, Matchers}
 import org.scalatest.junit.JUnitRunner
 
+@Ignore
 @RunWith(classOf[JUnitRunner])
 class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
   behavior of "Reporter"
@@ -65,9 +66,27 @@ class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
 
   it should "get repo info" in {
     val reportRenderer = new ReportRenderer()
-    val r = reporter.generateReport("apache/openwhisk", LocalDate.parse("2019-08-01"))
+    val r = reporter.generateReport("apache/openwhisk", LocalDate.parse("2019-09-07"))
     println("-------")
-    println(reportRenderer.render(r))
+    println(reportRenderer.render(r, false))
+    println("-------")
+  }
+
+  it should "get repo name" in {
+    val reportRenderer = new ReportRenderer()
+    val r =
+      reporter.collectRepoNames(Seq("apache/foo"), Some("apache"), Some("openwhisk"))
+    println("-------")
+    println(r.mkString("\n"))
+    println("-------")
+  }
+
+  it should "get repo info private" in {
+    val reporter = GithubReporter(GithubConfig(Some(token)).copy(uri = "https://git.corp.adobe.com/api/v3"))
+    val reportRenderer = new ReportRenderer()
+    val r = reporter.generateReport("adobe-apis/dcos-deploy", LocalDate.parse("2019-09-07"))
+    println("-------")
+    println(reportRenderer.render(r, true))
     println("-------")
   }
 
@@ -76,16 +95,32 @@ class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
     val r = RepoReport(
       "openwhisk",
       List(
-        Issue("SungHoHong2", 4577, "Feature request: Checkpoint for recovering failed actions", true, false),
+        Issue(
+          "SungHoHong2",
+          "https://github.com/SungHoHong2",
+          4577,
+          "Feature request: Checkpoint for recovering failed actions",
+          true,
+          false,
+          "https://github.com/apache/openwhisk/issues/456"),
         Issue(
           "steven0711dong",
+          "https://github.com/SungHoHong2",
           4574,
           "Update cache-invalidator build.gradle file to resolve bluemix-openwhiskl-cli build issue. ",
           true,
-          false),
-        Issue("chetanmeh", 4576, "Update to Scala 2.12.9", true, true)),
+          false,
+          "https://github.com/apache/openwhisk/issues/456"),
+        Issue(
+          "chetanmeh",
+          "https://github.com/chetanmeh",
+          4576,
+          "Update to Scala 2.12.9",
+          true,
+          true,
+          "https://github.com/apache/openwhisk/issues/456")),
       List.empty)
-    val o = reportRenderer.render(r)
+    val o = reportRenderer.render(Seq(r), true)
     println("-------")
     println(o)
     println("-------")
@@ -93,11 +128,10 @@ class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
 
   it should "get repo info for all" in {
     val reportRenderer = new ReportRenderer()
-    val reports = reporter.generateReport(repos, LocalDate.parse("2019-07-24"))
-    FileUtils.write(new File("report-serialized.txt"), serialise(reports), UTF_8)
-
+    val reports = reporter.generateReport(repos, LocalDate.parse("2019-08-07"))
+    FileUtils.write(new File("report-serialized2.txt"), serialise(reports), UTF_8)
     println("-------")
-    reports.foreach(r => println(reportRenderer.render(r)))
+    println(reportRenderer.render(reports, false))
     println("-------")
   }
 
@@ -108,7 +142,7 @@ class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
       deserialise(FileUtils.readFileToString(new File("report-serialized.txt"), UTF_8)).asInstanceOf[Seq[RepoReport]]
 
     println("-------")
-    println(reportRenderer.render(reports))
+    println(reportRenderer.render(reports, false))
     println("-------")
   }
 
