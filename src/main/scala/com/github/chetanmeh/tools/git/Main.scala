@@ -26,6 +26,9 @@ import org.apache.commons.io.FileUtils
 import org.rogach.scallop.{singleArgConverter, ScallopConf}
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.duration.Duration
+import scala.util.{Failure, Success, Try}
+
 class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   footer("\nGithub change reporter")
   this.printedName = "github"
@@ -33,8 +36,10 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   val token = opt[String](descr =
     "Github access token. See https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line")
 
-  val since = opt[LocalDate](descr = "Date since changes need tobe reported in yyyy-MM-dd format", required = true)(
-    singleArgConverter[LocalDate](LocalDate.parse(_)))
+  val since = opt[LocalDate](
+    descr = "Date since changes need tobe reported in yyyy-MM-dd format. " +
+      "One can also provide duration like '4 days`, '1 month'",
+    required = true)(singleArgConverter[LocalDate](Main.parseSinceDate))
 
   val out = opt[File](descr = "Output file path", default = Some(new File("report.md")))
 
@@ -69,9 +74,12 @@ object Main {
     val reporter = GithubReporter(config)
 
     log.info(s"Connecting to ${config.uri}")
+    log.info(s"Collecting changes since ${conf.since()}")
 
     val repoNames = reporter.collectRepoNames(conf.repoNames(), conf.org.toOption, conf.repoPrefix.toOption)
     require(repoNames.nonEmpty, "No repository name provided")
+    log.info(s"Report would be generated for ${repoNames.size} repositories")
+
     val reports = reporter.generateReport(repoNames, conf.since())
 
     val reportRenderer = new ReportRenderer()
@@ -84,5 +92,16 @@ object Main {
     val u = new URI(uri)
     //TODO Remove end slash if any in base uri
     if (u.getHost != "api.github.com") uri + "/api/v3" else uri
+  }
+
+  def parseSinceDate(dateStr: String): LocalDate = {
+    Try(LocalDate.parse(dateStr)) match {
+      case Success(d) => d
+      case Failure(_) =>
+        Try {
+          val d = Duration(dateStr)
+          LocalDate.now().minusDays(d.toDays)
+        }.getOrElse(throw new IllegalArgumentException("Cannot parse since time " + dateStr))
+    }
   }
 }
