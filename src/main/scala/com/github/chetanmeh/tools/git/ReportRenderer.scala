@@ -19,6 +19,9 @@ package com.github.chetanmeh.tools.git
 
 import java.nio.charset.StandardCharsets.UTF_8
 
+import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.util.data.MutableDataSet
 import org.apache.commons.io.IOUtils
 import org.fusesource.scalate._
 import org.fusesource.scalate.support.StringTemplateSource
@@ -32,12 +35,21 @@ class ReportRenderer(template: String = "repo-report.ssp") {
     e
   }
 
-  def render(report: RepoReport): String = {
-    engine.layout(template, Map("repo" -> report))
+  def render(report: RepoReport, htmlMode: Boolean = false): String = {
+    engine.layout(template, Map("repo" -> report, "htmlMode" -> htmlMode))
   }
 
-  def render(reports: Seq[RepoReport]): String = {
-    reports.map(render).mkString("\n")
+  def render(reports: Seq[RepoReport], htmlMode: Boolean): String = {
+    val r = reports.map(render(_, htmlMode)).mkString("\n")
+    if (htmlMode) mdToHtml(r) else r
+  }
+
+  def mdToHtml(report: String): String = {
+    val options = new MutableDataSet()
+    val parser = Parser.builder(options).build()
+    val renderer = HtmlRenderer.builder(options).build()
+    val doc = parser.parse(report)
+    renderer.render(doc)
   }
 }
 

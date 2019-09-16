@@ -1,4 +1,5 @@
 <%@ val repo: com.github.chetanmeh.tools.git.RepoReport %>
+<%@ val htmlMode: Boolean %>
 <%
     val H1 = "#"
     val H2 = "#" * 2
@@ -6,14 +7,14 @@
 ${H1} ${repo.name}
 #if (repo.issues.nonEmpty)
 ${H2} Issues
-<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isNewlyOpened), "heading" -> "Created"))%>
-<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isClosed), "heading" -> "Closed"))%>
-<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isUpdate), "heading" -> "Updated"))%>
+<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isNewlyOpened), "heading" -> "Created", "html" -> htmlMode))%>
+<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isClosed), "heading" -> "Closed", "html" -> htmlMode))%>
+<% render("issue.ssp", Map("issues" -> repo.issues.filter(_.isUpdate), "heading" -> "Updated", "html" -> htmlMode))%>
 #end
 #if (repo.pulls.nonEmpty)
 ${H2} Pull Requests
-<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isMerged), "heading" -> "Merged"))%>
-<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isNewlyOpened), "heading" -> "Created"))%>
-<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isClosed), "heading" -> "Closed"))%>
-<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isUpdate), "heading" -> "Updated"))%>
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isMerged), "heading" -> "Merged", "html" -> htmlMode))%>
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isNewlyOpened), "heading" -> "Created", "html" -> htmlMode))%>
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isClosed), "heading" -> "Closed", "html" -> htmlMode))%>
+<% render("pr.ssp", Map("pulls" -> repo.pulls.filter(_.isUpdate), "heading" -> "Updated", "html" -> htmlMode))%>
 #end

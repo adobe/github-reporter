@@ -1,12 +1,18 @@
 <%@ val issues: Seq[com.github.chetanmeh.tools.git.Issue] %>
 <%@ val heading: String %>
+<%@ val htmlMode: Boolean %>
 <%
     val H1 = "#"
     val H3 = "#" * 3
 %>
 #if (issues.nonEmpty)
 ${H3} ${heading}:
-#for (i <- issues)
+<%
+    for (i <- issues)
+    if (htmlMode) {
+%>
+* ${i.title} [${H1}${i.id.toString}](${i.url})([${i.creator}] (${i.url}))
+<% } else {%>
     * ${H1}${i.id.toString} - ${i.title} (${i.creator})
-#end
+<%}%>
 #end

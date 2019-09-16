@@ -23,7 +23,13 @@ import java.time.format.DateTimeFormatter
 import javax.json.JsonObject
 
 package object git {
-  case class Issue(creator: String, id: Int, title: String, isNew: Boolean, open: Boolean) {
+  case class Issue(creator: String,
+                   creatorUrl: String,
+                   id: Int,
+                   title: String,
+                   isNew: Boolean,
+                   open: Boolean,
+                   url: String) {
     def isNewlyOpened: Boolean = isNew && open
     def isUpdate: Boolean = !isNew && open
     def isClosed: Boolean = !open
@@ -32,11 +38,18 @@ package object git {
   object Issue {
     def apply(json: JsonObject, since: LocalDate): Issue = {
       val c = CommonAttr(json, since)
-      Issue(c.creator, c.id, c.title, c.isNew, c.open)
+      Issue(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, c.url)
     }
   }
 
-  case class PullRequest(creator: String, id: Int, title: String, isNew: Boolean, open: Boolean, merged: Boolean) {
+  case class PullRequest(creator: String,
+                         creatorUrl: String,
+                         id: Int,
+                         title: String,
+                         isNew: Boolean,
+                         open: Boolean,
+                         merged: Boolean,
+                         url: String) {
     def isNewlyOpened: Boolean = isNew && open
     def isUpdate: Boolean = !isNew && open
     def isClosed: Boolean = !open && !merged
@@ -46,7 +59,7 @@ package object git {
   object PullRequest {
     def apply(json: JsonObject, since: LocalDate): PullRequest = {
       val c = CommonAttr(json, since)
-      PullRequest(c.creator, c.id, c.title, c.isNew, c.open, json.getBoolean("merged"))
+      PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, json.getBoolean("merged"), c.url)
     }
   }
 
@@ -58,7 +71,13 @@ package object git {
     DateTimeFormatter.ISO_DATE_TIME.parse(str, LocalDate.from _)
   }
 
-  case class CommonAttr(creator: String, id: Int, title: String, isNew: Boolean, open: Boolean)
+  case class CommonAttr(creator: String,
+                        creatorUrl: String,
+                        id: Int,
+                        title: String,
+                        isNew: Boolean,
+                        open: Boolean,
+                        url: String)
 
   object CommonAttr {
     def apply(json: JsonObject, since: LocalDate): CommonAttr = {
@@ -66,10 +85,12 @@ package object git {
       val createdAt = asDate(json.getString("created_at"))
       CommonAttr(
         json.getJsonObject("user").getString("login"),
+        json.getJsonObject("user").getString("html_url"),
         json.getInt("number"),
         json.getString("title"),
         createdAt.isAfter(since.minusDays(1)),
-        json.getString("state") == "open")
+        json.getString("state") == "open",
+        json.getString("url"))
     }
   }
 

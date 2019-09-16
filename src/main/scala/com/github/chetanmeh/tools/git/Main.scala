@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 
 import com.google.common.base.Stopwatch
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.{FileUtils, FilenameUtils}
 import org.rogach.scallop.{singleArgConverter, ScallopConf}
 import org.slf4j.LoggerFactory
 
@@ -61,6 +61,12 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
       "prefix would be used",
     required = false)
 
+  val htmlMode =
+    opt[Boolean](
+      descr = "Render in HTML mode. By default report is rendered in Markdown format",
+      required = false,
+      noshort = true)
+
   dependsOnAll(repoPrefix, List(org))
   verify()
 }
@@ -83,9 +89,10 @@ object Main {
     val reports = reporter.generateReport(repoNames, conf.since())
 
     val reportRenderer = new ReportRenderer()
-    FileUtils.write(conf.out(), reportRenderer.render(reports), UTF_8)
+    val file = getOutputFile(conf)
+    FileUtils.write(file, reportRenderer.render(reports, conf.htmlMode()), UTF_8)
     log.info(s"Report generated in $w")
-    log.info(s"Report written to ${conf.out().getAbsolutePath}")
+    log.info(s"Report written to ${file.getAbsolutePath}")
   }
 
   def adaptUri(uri: String): String = {
@@ -103,5 +110,12 @@ object Main {
           LocalDate.now().minusDays(d.toDays)
         }.getOrElse(throw new IllegalArgumentException("Cannot parse since time " + dateStr))
     }
+  }
+
+  def getOutputFile(conf: Conf): File = {
+    val f = conf.out()
+    if (conf.htmlMode() && FilenameUtils.getExtension(f.getName) == "md") {
+      new File(f.getParentFile, FilenameUtils.removeExtension(f.getName) + ".html")
+    } else f
   }
 }
