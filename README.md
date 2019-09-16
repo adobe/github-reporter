@@ -7,6 +7,8 @@ overview of work being done across multiple repositories.
 $ java -jar github-reporter.jar --since "2 days" apache/openwhisk 
 ```
 
+If you get an error like _"API rate limit exceeded"_ then you would need to configure a [personal access token][2] via `-t` option
+
 Download the current snapshot release from [here][1]
 
 The generated report looks like below
@@ -75,4 +77,32 @@ $ java -jar build/libs/github-reporter-1.0-SNAPSHOT.jar -h
 Github change reporter
 ```
 
+Examples
+
+To generate report for last 5 days for all repos in a org https://github.com/apache which start with `openwhisk`
+
+```bash
+$ java -jar github-reporter.jar --since "2 days" --org apache --repo-prefix openwhisk -t $GITHUB_TOKEN
+```
+
+## Build
+
+You can build the jar locally via 
+
+```bash
+$ ./gradlew build
+```
+
+## Design
+
+This tool is implemented in Scala and uses following libraries
+
+1. [jcabi github][3] - Object Oriented Wrapper of Github API
+2. [scalate][4] - For report templates
+3. [flexmark-java][5] - For converting markdown to html
+ 
 [1]: https://git.corp.adobe.com/chetanm/github-reporter/releases/download/SNAPSHOT/github-reporter-1.0-SNAPSHOT.jar
+[2]: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
+[3]: https://github.com/jcabi/jcabi-github
+[4]: https://scalate.github.io/scalate/
+[5]: https://github.com/vsch/flexmark-java
