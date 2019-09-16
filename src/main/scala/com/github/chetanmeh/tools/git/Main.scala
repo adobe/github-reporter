@@ -17,6 +17,7 @@
 package com.github.chetanmeh.tools.git
 
 import java.io.File
+import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 
@@ -64,7 +65,10 @@ object Main {
   def main(args: Array[String]): Unit = {
     val w = Stopwatch.createStarted()
     val conf = new Conf(args)
-    val reporter = GithubReporter(GithubConfig(conf.token.toOption, conf.uri()))
+    val config = GithubConfig(conf.token.toOption, adaptUri(conf.uri()))
+    val reporter = GithubReporter(config)
+
+    log.info(s"Connecting to ${config.uri}")
 
     val repoNames = reporter.collectRepoNames(conf.repoNames(), conf.org.toOption, conf.repoPrefix.toOption)
     require(repoNames.nonEmpty, "No repository name provided")
@@ -74,5 +78,11 @@ object Main {
     FileUtils.write(conf.out(), reportRenderer.render(reports), UTF_8)
     log.info(s"Report generated in $w")
     log.info(s"Report written to ${conf.out().getAbsolutePath}")
+  }
+
+  def adaptUri(uri: String): String = {
+    val u = new URI(uri)
+    //TODO Remove end slash if any in base uri
+    if (u.getHost != "api.github.com") uri + "/api/v3" else uri
   }
 }
