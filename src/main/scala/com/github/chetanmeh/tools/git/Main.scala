@@ -49,7 +49,11 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
       required = false,
       default = Some(List.empty))
 
-  val uri = opt[String](descr = "Github server uri", default = Some("https://api.github.com"))
+  val githubUri = opt[String](
+    descr =
+      "Github server uri. By default it refers to public github. If your repo is on an internal enterprise deployment then set this to the server url",
+    default = Some("https://api.github.com"),
+    noshort = true)
 
   val org = opt[String](
     descr = "Organization name. Reporter would find its repositories and generate report " +
@@ -59,7 +63,8 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   val repoPrefix = opt[String](
     descr = "Repo name prefix. If provided only repo whose name start with the provided " +
       "prefix would be used",
-    required = false)
+    required = false,
+    noshort = true)
 
   val htmlMode =
     opt[Boolean](
@@ -76,7 +81,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     val w = Stopwatch.createStarted()
     val conf = new Conf(args)
-    val config = GithubConfig(conf.token.toOption, adaptUri(conf.uri()))
+    val config = GithubConfig(conf.token.toOption, adaptUri(conf.githubUri()))
     val reporter = GithubReporter(config)
 
     log.info(s"Connecting to ${config.uri}")
