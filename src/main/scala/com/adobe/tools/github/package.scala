@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-package com.github.chetanmeh.tools
+package com.adobe.tools
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import javax.json.JsonObject
 
-package object git {
+package object github {
   case class Issue(creator: String,
                    creatorUrl: String,
                    id: Int,

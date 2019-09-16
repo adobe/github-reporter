@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.chetanmeh.tools.git
+package com.adobe.tools.github
 
 import java.io.File
 import java.net.URI

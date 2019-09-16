@@ -29,7 +29,7 @@ plugins {
 
 apply plugin: ScalatePlugin
 
-group 'com.github.chetanmeh.tools.git'
+group 'com.adobe'
 version '1.0-SNAPSHOT'
 scalafmt.configFilePath = gradle.scalafmt.config
 project.archivesBaseName = "github-reporter"
@@ -75,7 +75,7 @@ tasks.withType(ScalaCompile) {
 }
 
 bootJar {
-    mainClassName = 'com.github.chetanmeh.tools.git.Main'
+    mainClassName = 'com.adobe.tools.github.Main'
 }
 
 tasks.withType(Test) {

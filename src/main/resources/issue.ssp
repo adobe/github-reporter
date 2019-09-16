@@ -1,4 +1,4 @@
-<%@ val issues: Seq[com.github.chetanmeh.tools.git.Issue] %>
+<%@ val issues: Seq[com.adobe.tools.github.Issue] %>
 <%@ val heading: String %>
 <%@ val htmlMode: Boolean %>
 <%

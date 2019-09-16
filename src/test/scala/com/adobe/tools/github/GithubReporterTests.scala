@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.github.chetanmeh.tools.git
+package com.adobe.tools.github
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, ObjectInputStream, ObjectOutputStream}
 import java.nio.charset.StandardCharsets.UTF_8
@@ -87,42 +87,6 @@ class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
     val r = reporter.generateReport("adobe-apis/dcos-deploy", LocalDate.parse("2019-09-07"))
     println("-------")
     println(reportRenderer.render(r, true))
-    println("-------")
-  }
-
-  it should "render" in {
-    val reportRenderer = new ReportRenderer()
-    val r = RepoReport(
-      "openwhisk",
-      List(
-        Issue(
-          "SungHoHong2",
-          "https://github.com/SungHoHong2",
-          4577,
-          "Feature request: Checkpoint for recovering failed actions",
-          true,
-          false,
-          "https://github.com/apache/openwhisk/issues/456"),
-        Issue(
-          "steven0711dong",
-          "https://github.com/SungHoHong2",
-          4574,
-          "Update cache-invalidator build.gradle file to resolve bluemix-openwhiskl-cli build issue. ",
-          true,
-          false,
-          "https://github.com/apache/openwhisk/issues/456"),
-        Issue(
-          "chetanmeh",
-          "https://github.com/chetanmeh",
-          4576,
-          "Update to Scala 2.12.9",
-          true,
-          true,
-          "https://github.com/apache/openwhisk/issues/456")),
-      List.empty)
-    val o = reportRenderer.render(Seq(r), true)
-    println("-------")
-    println(o)
     println("-------")
   }
 

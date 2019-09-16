@@ -1,4 +1,4 @@
-<%@ val pulls: Seq[com.github.chetanmeh.tools.git.PullRequest] %>
+<%@ val pulls: Seq[com.adobe.tools.github.PullRequest] %>
 <%@ val heading: String %>
 <%@ val htmlMode: Boolean %>
 <%

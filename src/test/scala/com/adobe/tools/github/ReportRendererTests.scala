@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.github.chetanmeh.tools.git
+package com.adobe.tools.github
 
 import org.junit.runner.RunWith
 import org.scalatest.{FlatSpec, Matchers}

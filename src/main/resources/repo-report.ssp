@@ -1,4 +1,4 @@
-<%@ val repo: com.github.chetanmeh.tools.git.RepoReport %>
+<%@ val repo: com.adobe.tools.github.RepoReport %>
 <%@ val htmlMode: Boolean %>
 <%
     val H1 = "#"
