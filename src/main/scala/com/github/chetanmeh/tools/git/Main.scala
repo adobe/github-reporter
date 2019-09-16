@@ -45,6 +45,17 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   val uri = opt[String](descr = "Github server uri", default = Some("https://api.github.com"))
 
+  val org = opt[String](
+    descr = "Organization name. Reporter would find its repositories and generate report " +
+      "for them. If any prefix if provided then only those repo would be selected",
+    required = false)
+
+  val repoPrefix = opt[String](
+    descr = "Repo name prefix. If provided only repo whose name start with the provided " +
+      "prefix would be used",
+    required = false)
+
+  dependsOnAll(repoPrefix, List(org))
   verify()
 }
 
@@ -54,7 +65,10 @@ object Main {
     val w = Stopwatch.createStarted()
     val conf = new Conf(args)
     val reporter = GithubReporter(GithubConfig(conf.token.toOption, conf.uri()))
-    val reports = reporter.generateReport(conf.repoNames(), conf.since())
+
+    val repoNames = reporter.collectRepoNames(conf.repoNames(), conf.org.toOption, conf.repoPrefix.toOption)
+    require(repoNames.nonEmpty, "No repository name provided")
+    val reports = reporter.generateReport(repoNames, conf.since())
 
     val reportRenderer = new ReportRenderer()
     FileUtils.write(conf.out(), reportRenderer.render(reports), UTF_8)

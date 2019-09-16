@@ -72,4 +72,10 @@ package object git {
         json.getString("state") == "open")
     }
   }
+
+  case class RepoInfo(fullName: String, name: String)
+
+  object RepoInfo {
+    def apply(json: JsonObject): RepoInfo = RepoInfo(json.getString("full_name"), json.getString("name"))
+  }
 }

@@ -57,6 +57,28 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     repoNames.map(r => generateReport(r, since)).filter(_.notEmpty).sortBy(_.name)
   }
 
+  def collectRepoNames(providedNames: Seq[String],
+                       orgName: Option[String] = None,
+                       prefix: Option[String] = None): Seq[String] = {
+    val orgRepos = orgName.map(collectRepoNames(_, prefix)).getOrElse(Seq.empty)
+    val result = providedNames ++ orgRepos
+    result.toSet.toList
+  }
+
+  def collectRepoNames(orgName: String, prefix: Option[String]): Seq[String] = {
+    //Later we should see if `since` can be used to filter out repo here itself
+    repoPaginator(orgName)
+      .map(RepoInfo(_))
+      .filter { r =>
+        prefix match {
+          case Some(p) => r.name.startsWith(p)
+          case _       => true
+        }
+      }
+      .map(_.fullName)
+      .toList
+  }
+
   private def isPull(issueJson: JsonObject): Boolean = issueJson.containsKey("pull_request")
 
   private def getPull(issueJson: JsonObject, repo: Repo): JsonObject = {
@@ -80,9 +102,24 @@ case class GithubReporter(github: Github, config: GithubConfig) {
       "direction" -> "desc",
       "state" -> "all",
       "since" -> since.format(DateTimeFormatter.ISO_DATE))
+    paginatedIterable(request, params)
+  }
 
-    val p = new RtPagination[JsonObject](request.uri.queryParams(params.asJava).back, x => x)
-    p.asScala
+  private def repoPaginator(org: String) = {
+    val request = github
+      .entry()
+      .uri()
+      .path("/orgs")
+      .path(org)
+      .path("/repos")
+      .back()
+
+    val params = Map("per_page" -> "100")
+    paginatedIterable(request, params)
+  }
+
+  private def paginatedIterable(r: Request, params: Map[String, String]) = {
+    new RtPagination[JsonObject](r.uri.queryParams(params.asJava).back, x => x).asScala
   }
 }
 
