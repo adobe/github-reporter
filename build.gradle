@@ -53,7 +53,9 @@ dependencies {
     compile 'javax.json:javax.json-api:1.0'
     compile 'javax.ws.rs:javax.ws.rs-api:2.0.1'
 
-    compile 'org.scalatra.scalate:scalate-core_2.12:1.9.4'
+    compile ('org.scalatra.scalate:scalate-core_2.12:1.9.4'){
+        exclude group: "org.scala-lang", module:"scala-compiler"
+    }
     compile 'commons-io:commons-io:2.6'
 
     compile 'ch.qos.logback:logback-classic:1.2.3'
@@ -68,6 +70,7 @@ dependencies {
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.scalatest:scalatest_2.12:3.0.3'
+    compileOnly "org.scala-lang:scala-compiler:${gradle.scala.version}"
 }
 
 tasks.withType(ScalaCompile) {
