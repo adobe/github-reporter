@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter
 
 import javax.json.JsonObject
 import spray.json.DefaultJsonProtocol._
+import scala.collection.JavaConverters._
 
 package object github {
   case class Issue(creator: String,
@@ -25,17 +26,18 @@ package object github {
                    isNew: Boolean,
                    open: Boolean,
                    url: String,
-                   repoFullName: String) {
+                   repoFullName: String,
+                   labels: List[String]) {
     def isNewlyOpened: Boolean = isNew && open
     def isUpdate: Boolean = !isNew && open
     def isClosed: Boolean = !open
   }
 
   object Issue {
-    implicit val serdes = jsonFormat8(Issue.apply)
+    implicit val serdes = jsonFormat9(Issue.apply)
     def apply(json: JsonObject, since: LocalDate, repoFullName: String): Issue = {
       val c = CommonAttr(json, since)
-      Issue(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, c.url, repoFullName)
+      Issue(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, c.url, repoFullName, c.labels)
     }
   }
 
@@ -47,7 +49,8 @@ package object github {
                          open: Boolean,
                          merged: Boolean,
                          url: String,
-                         repoFullName: String) {
+                         repoFullName: String,
+                         labels: List[String]) {
     def isNewlyOpened: Boolean = isNew && open
     def isUpdate: Boolean = !isNew && open
     def isClosed: Boolean = !open && !merged
@@ -55,10 +58,10 @@ package object github {
   }
 
   object PullRequest {
-    implicit val serdes = jsonFormat9(PullRequest.apply)
+    implicit val serdes = jsonFormat10(PullRequest.apply)
     def apply(json: JsonObject, since: LocalDate, merged: Boolean, repoFullName: String): PullRequest = {
       val c = CommonAttr(json, since)
-      PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, merged, c.url, repoFullName)
+      PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, merged, c.url, repoFullName, c.labels)
     }
 
     def isOpen(json: JsonObject): Boolean = json.getString("state") == "open"
@@ -82,7 +85,8 @@ package object github {
                         title: String,
                         isNew: Boolean,
                         open: Boolean,
-                        url: String)
+                        url: String,
+                        labels: List[String])
 
   object CommonAttr {
     def apply(json: JsonObject, since: LocalDate): CommonAttr = {
@@ -95,7 +99,8 @@ package object github {
         json.getString("title"),
         createdAt.isAfter(since),
         json.getString("state") == "open",
-        json.getString("html_url"))
+        json.getString("html_url"),
+        json.getJsonArray("labels").asScala.map(x => x.asInstanceOf[JsonObject].getString("name")).toList)
     }
   }
 

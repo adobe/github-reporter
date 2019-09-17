@@ -42,9 +42,15 @@ class ReportRendererTests extends FlatSpec with Matchers {
 
   private def createSampleDataSet(): RepoReport = {
     val issueList = List(
-      ("SungHoHong2", 4577, "Feature request: Checkpoint for recovering failed ", true, false),
-      ("SungHoHong2", 4574, "Update cache-invalidator build.gradle file to resolve  build issue.", true, false),
-      ("chetanmeh", 4576, "Update to Scala 2.12.9", true, true))
+      ("SungHoHong2", 4577, "Feature request: Checkpoint for recovering failed ", true, false, List("foo")),
+      (
+        "SungHoHong2",
+        4574,
+        "Update cache-invalidator build.gradle file to resolve  build issue.",
+        true,
+        false,
+        List.empty[String]),
+      ("chetanmeh", 4576, "Update to Scala 2.12.9", true, true, List.empty[String]))
 
     val issues = issueList.map(
       i =>
@@ -56,12 +62,20 @@ class ReportRendererTests extends FlatSpec with Matchers {
           i._4,
           i._5,
           s"https://github.com/apache/openwhisk/issues/${i._2}",
-          "foo/bar"))
+          "foo/bar",
+          i._6))
 
     val prList = List(
-      ("BillZong", 4618, "fix: controller ambiguous task env setting", true, false, true),
-      ("BillZong", 4619, "Add ansible deploy options", true, false, false),
-      ("jiangpengcheng", 4617, "Add kind &quot;unknown&quot; to fallback activations", true, true, false))
+      ("BillZong", 4618, "fix: controller ambiguous task env setting", true, false, true, List.empty[String]),
+      ("BillZong", 4619, "Add ansible deploy options", true, false, false, List.empty[String]),
+      (
+        "jiangpengcheng",
+        4617,
+        "Add kind &quot;unknown&quot; to fallback activations",
+        true,
+        true,
+        false,
+        List.empty[String]))
 
     val pulls = prList.map(
       i =>
@@ -74,7 +88,8 @@ class ReportRendererTests extends FlatSpec with Matchers {
           i._5,
           i._6,
           s"https://github.com/apache/openwhisk/issues/${i._2}",
-          "foo/bar"))
+          "foo/bar",
+          i._7))
     RepoReport("openwhisk", issues, pulls)
   }
 }
