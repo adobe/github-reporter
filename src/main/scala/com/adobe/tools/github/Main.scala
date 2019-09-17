@@ -97,8 +97,8 @@ object Main {
 
   def adaptUri(uri: String): String = {
     val u = new URI(uri)
-    //TODO Remove end slash if any in base uri
-    if (u.getHost != "api.github.com") uri + "/api/v3" else uri
+    val ru = if (uri.endsWith("/")) uri.dropRight(1) else uri
+    if (u.getHost != "api.github.com") ru + "/api/v3" else ru
   }
 
   def parseSinceDate(dateStr: String): LocalDate = {
