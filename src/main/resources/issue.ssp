@@ -11,7 +11,7 @@ ${H3} ${heading}:
     for (i <- issues)
     if (htmlMode) {
 %>
-* ${i.title} [${H1}${i.id.toString}](${i.url})([${i.creator}] (${i.url}))
+* ${i.title} [${H1}${i.id.toString}](${i.url}) ([${i.creator}](${i.creatorUrl}))
 <% } else {%>
     * ${H1}${i.id.toString} - ${i.title} (${i.creator})
 <%}%>
