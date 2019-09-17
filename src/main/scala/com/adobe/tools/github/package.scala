@@ -100,7 +100,7 @@ package object github {
         json.getString("title"),
         createdAt.isAfter(since),
         json.getString("state") == "open",
-        json.getString("url"))
+        json.getString("html_url"))
     }
   }
 
