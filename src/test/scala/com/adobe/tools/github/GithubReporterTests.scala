@@ -18,12 +18,12 @@ import java.util.Base64
 
 import org.apache.commons.io.FileUtils
 import org.junit.runner.RunWith
-import org.scalatest.{FlatSpec, Ignore, Matchers}
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.{FlatSpec, Ignore, Matchers}
 
 @Ignore
 @RunWith(classOf[JUnitRunner])
-class GithubReporterTests extends FlatSpec with Matchers with ReporterTestBase {
+class GithubReporterTests extends FlatSpec with Matchers {
   behavior of "Reporter"
 
   val token = sys.env("GITHUB_TOKEN")
