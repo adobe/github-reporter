@@ -84,15 +84,16 @@ object Main {
     val conf = new Conf(args)
     val config = GithubConfig(conf.token.toOption, adaptUri(conf.githubUri()))
     val reporter = GithubReporter(config)
+    val since = conf.since().minusDays(1)
 
     log.info(s"Connecting to ${config.uri}")
     log.info(s"Collecting changes since ${conf.since()}")
 
-    val repoNames = reporter.collectRepoNames(conf.repoNames(), conf.org.toOption, conf.repoPrefix.toOption)
+    val repoNames = reporter.collectRepoInfo(conf.repoNames(), since, conf.org.toOption, conf.repoPrefix.toOption)
     require(repoNames.nonEmpty, "No repository name provided")
     log.info(s"Report would be generated for ${repoNames.size} repositories")
 
-    val reports = reporter.generateReport(repoNames, conf.since())
+    val reports = reporter.generateReport(repoNames, since)
 
     val reportRenderer = new ReportRenderer()
     val file = getOutputFile(conf)

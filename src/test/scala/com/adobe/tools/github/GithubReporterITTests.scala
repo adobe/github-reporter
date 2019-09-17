@@ -27,7 +27,7 @@ class GithubReporterITTests extends IntegrationTestBase {
   val reporter = GithubReporter(GithubConfig(Some(token)))
 
   it should "collect all repos" in {
-    val repos = reporter.collectRepoNames(Seq("apache/openwhisk"), Some(testOrg), Some("reporter"))
+    val repos = reporter.collectRepoInfo(Seq("apache/openwhisk"), creationDate, Some(testOrg), Some("reporter"))
     repos should contain allOf ("apache/openwhisk", "github-reporter-test/reporter-ui", "github-reporter-test/reporter-app")
     repos should not contain ("tools")
   }

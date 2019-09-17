@@ -20,6 +20,7 @@ import com.jcabi.http.request.ApacheRequest
 import com.jcabi.http.wire.{AutoRedirectingWire, RetryWire}
 import javax.json.JsonObject
 import javax.ws.rs.core.{HttpHeaders, MediaType}
+import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -27,6 +28,8 @@ import scala.collection.mutable
 case class GithubConfig(accessToken: Option[String], uri: String = "https://api.github.com")
 
 case class GithubReporter(github: Github, config: GithubConfig) {
+  private val log = LoggerFactory.getLogger(getClass)
+  import GithubReporter._
 
   def generateReport(repoName: String, since: LocalDate): RepoReport = {
     val coords = new Coordinates.Simple(repoName)
@@ -57,26 +60,33 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     repoNames.map(r => generateReport(r, since)).filter(_.notEmpty).sortBy(_.name)
   }
 
-  def collectRepoNames(providedNames: Seq[String],
-                       orgName: Option[String] = None,
-                       prefix: Option[String] = None): Seq[String] = {
-    val orgRepos = orgName.map(collectRepoNames(_, prefix)).getOrElse(Seq.empty)
+  def collectRepoInfo(providedNames: Seq[String],
+                      since: LocalDate,
+                      orgName: Option[String] = None,
+                      prefix: Option[String] = None): Seq[String] = {
+    val orgRepos = orgName.map(collectRepoNames(_, since, prefix)).getOrElse(Seq.empty)
     val result = providedNames ++ orgRepos
     result.toSet.toList.sorted
   }
 
-  def collectRepoNames(orgName: String, prefix: Option[String]): Seq[String] = {
+  def collectRepoNames(orgName: String, since: LocalDate, prefix: Option[String]): Seq[String] = {
     //Later we should see if `since` can be used to filter out repo here itself
     repoPaginator(orgName)
       .map(RepoInfo(_))
       .filter { r =>
-        prefix match {
-          case Some(p) => r.name.startsWith(p)
-          case _       => true
-        }
+        shouldIncludeRepo(r, since, prefix)
       }
       .map(_.fullName)
       .toList
+  }
+
+  private def shouldIncludeRepo(repo: RepoInfo, since: LocalDate, prefix: Option[String]): Boolean = {
+    val prefixMatched = matchPrefix(repo.name, prefix)
+    val repoUpdated = repoUpdatedSince(repo, since)
+    if (prefixMatched && !repoUpdated) {
+      log.info(s"Ignoring repo ${repo.fullName} as its not found to be updated")
+    }
+    prefixMatched && repoUpdated
   }
 
   private def isPull(issueJson: JsonObject): Boolean = issueJson.containsKey("pull_request")
@@ -145,4 +155,22 @@ object GithubReporter {
 
   private def authenticatedRequest(req: Request, token: String) =
     req.header(HttpHeaders.AUTHORIZATION, s"token $token")
+
+  def matchPrefix(repoName: String, prefix: Option[String]): Boolean = {
+    prefix match {
+      case Some(p) => repoName.startsWith(p)
+      case _       => true
+    }
+  }
+
+  def repoUpdatedSince(repo: RepoInfo, since: LocalDate): Boolean = {
+    // If any issue/pr is modified then it does not impact the updatedTime
+    // So we select repo which are either actually updated after given date
+    // or there open issue count is > 0 which indicates that some issue/pr has
+    // been opened but repo is not updated yet
+    // Untill we query for actual issue and PR updated/creation time we cannot
+    // determine if no " interesting update" happened to the repo
+    val isUpdated = repo.updated_at.isAfter(since) || repo.open_issues_count > 0
+    !repo.archived && isUpdated
+  }
 }

@@ -98,15 +98,22 @@ package object github {
         json.getJsonObject("user").getString("html_url"),
         json.getInt("number"),
         json.getString("title"),
-        createdAt.isAfter(since.minusDays(1)),
+        createdAt.isAfter(since),
         json.getString("state") == "open",
         json.getString("url"))
     }
   }
 
-  case class RepoInfo(fullName: String, name: String)
+  case class RepoInfo(fullName: String, name: String, updated_at: LocalDate, open_issues_count: Int, archived: Boolean)
 
   object RepoInfo {
-    def apply(json: JsonObject): RepoInfo = RepoInfo(json.getString("full_name"), json.getString("name"))
+    //https://developer.github.com/v3/repos/#list-organization-repositories
+    def apply(json: JsonObject): RepoInfo =
+      RepoInfo(
+        json.getString("full_name"),
+        json.getString("name"),
+        asDate(json.getString("updated_at")),
+        json.getInt("open_issues_count"),
+        json.getBoolean("archived"))
   }
 }

@@ -27,7 +27,7 @@ abstract class IntegrationTestBase extends FlatSpec with Matchers {
   val token = sys.env(tokenEnvName)
 
   val testOrg = "github-reporter-test"
-  val creationDate = LocalDate.of(2019, 9, 16)
+  val creationDate = LocalDate.of(2019, 9, 16).minusDays(1)
   val creationDateStr = creationDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
   //For running these test a test org `github-reporter-test` is created in github
