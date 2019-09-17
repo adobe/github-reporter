@@ -49,13 +49,15 @@ It supports multiple options
 4. Pass access token for higher rate limits
 5. Send mail (TODO)
 
-```bash
+```
 $ java -jar build/libs/github-reporter-1.0-SNAPSHOT.jar -h
       --github-uri  <arg>    Github server uri. By default it refers to public
                              github. If your repo is on an internal enterprise
                              deployment then set this to the server url
       --html-mode            Render in HTML mode. By default report is rendered
                              in Markdown format
+      --json-mode            Render in json mode. If enables then another report
+                             in json mode would also be rendered
       --org  <arg>           Organization name. Reporter would find its
                              repositories and generate report for them. If any
                              prefix if provided then only those repo would be
