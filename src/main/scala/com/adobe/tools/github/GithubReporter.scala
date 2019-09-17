@@ -56,7 +56,7 @@ case class GithubReporter(github: Github, config: GithubConfig) {
                        prefix: Option[String] = None): Seq[String] = {
     val orgRepos = orgName.map(collectRepoNames(_, prefix)).getOrElse(Seq.empty)
     val result = providedNames ++ orgRepos
-    result.toSet.toList
+    result.toSet.toList.sorted
   }
 
   def collectRepoNames(orgName: String, prefix: Option[String]): Seq[String] = {
