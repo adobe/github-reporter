@@ -54,15 +54,8 @@ package object github {
 
   object PullRequest {
     implicit val serdes = jsonFormat8(PullRequest.apply)
-    def apply(json: JsonObject, since: LocalDate): PullRequest = {
-      apply(CommonAttr(json, since), json.getBoolean("merged"))
-    }
-
-    def forOpenPR(json: JsonObject, since: LocalDate): PullRequest = {
-      apply(CommonAttr(json, since), merged = false)
-    }
-
-    def apply(c: CommonAttr, merged: Boolean): PullRequest = {
+    def apply(json: JsonObject, since: LocalDate, merged: Boolean): PullRequest = {
+      val c = CommonAttr(json, since)
       PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, merged, c.url)
     }
 

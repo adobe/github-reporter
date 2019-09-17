@@ -11,10 +11,11 @@ governing permissions and limitations under the License.
  */
 package com.adobe.tools.github
 
+import java.net.URI
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-import com.jcabi.github.{Coordinates, FromProperties, Github, Repo, RtGithub, RtPagination}
+import com.jcabi.github.{Coordinates, FromProperties, Github, RtGithub, RtPagination}
 import com.jcabi.http.Request
 import com.jcabi.http.request.ApacheRequest
 import com.jcabi.http.wire.{AutoRedirectingWire, RetryWire}
@@ -42,10 +43,10 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     issueItr.foreach { json =>
       if (isPull(json)) {
         val pr = if (PullRequest.isOpen(json)) {
-          PullRequest.forOpenPR(json, since)
+          PullRequest(json, since, merged = false)
         } else {
           //Get pull details to determine the merged state
-          PullRequest(getPull(json, repo), since)
+          PullRequest(json, since, merged = isMerged(json))
         }
         pulls += pr
       } else {
@@ -91,10 +92,12 @@ case class GithubReporter(github: Github, config: GithubConfig) {
 
   private def isPull(issueJson: JsonObject): Boolean = issueJson.containsKey("pull_request")
 
-  private def getPull(issueJson: JsonObject, repo: Repo): JsonObject = {
-    val uri = issueJson.getJsonObject("pull_request").getString("html_url")
-    val prId = uri.substring(uri.lastIndexOf("/") + 1).toInt
-    repo.pulls().get(prId).json()
+  private def isMerged(issueJson: JsonObject): Boolean = {
+    //https://developer.github.com/v3/issues/#response
+    val uri = issueJson.getJsonObject("pull_request").getString("url")
+    //https://developer.github.com/v3/pulls/#get-if-a-pull-request-has-been-merged
+    val mergeUrl = uri + "/merge"
+    github.entry().uri().set(new URI(mergeUrl)).back().fetch().status() == 204
   }
 
   private def issuePaginator(coords: Coordinates, since: LocalDate) = {
