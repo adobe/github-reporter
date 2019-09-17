@@ -55,9 +55,18 @@ package object github {
   object PullRequest {
     implicit val serdes = jsonFormat8(PullRequest.apply)
     def apply(json: JsonObject, since: LocalDate): PullRequest = {
-      val c = CommonAttr(json, since)
-      PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, json.getBoolean("merged"), c.url)
+      apply(CommonAttr(json, since), json.getBoolean("merged"))
     }
+
+    def forOpenPR(json: JsonObject, since: LocalDate): PullRequest = {
+      apply(CommonAttr(json, since), merged = false)
+    }
+
+    def apply(c: CommonAttr, merged: Boolean): PullRequest = {
+      PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, merged, c.url)
+    }
+
+    def isOpen(json: JsonObject): Boolean = json.getString("state") == "open"
   }
 
   case class RepoReport(name: String, issues: List[Issue], pulls: List[PullRequest]) {

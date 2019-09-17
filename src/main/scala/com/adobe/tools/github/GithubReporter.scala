@@ -38,7 +38,13 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     val pulls = mutable.ListBuffer.empty[PullRequest]
     issueItr.foreach { json =>
       if (isPull(json)) {
-        pulls += PullRequest(getPull(json, repo), since)
+        val pr = if (PullRequest.isOpen(json)) {
+          PullRequest.forOpenPR(json, since)
+        } else {
+          //Get pull details to determine the merged state
+          PullRequest(getPull(json, repo), since)
+        }
+        pulls += pr
       } else {
         issues += Issue(json, since)
       }
