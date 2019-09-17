@@ -55,7 +55,8 @@ class ReportRendererTests extends FlatSpec with Matchers {
           i._3,
           i._4,
           i._5,
-          s"https://github.com/apache/openwhisk/issues/${i._2}"))
+          s"https://github.com/apache/openwhisk/issues/${i._2}",
+          "foo/bar"))
 
     val prList = List(
       ("BillZong", 4618, "fix: controller ambiguous task env setting", true, false, true),
@@ -72,7 +73,8 @@ class ReportRendererTests extends FlatSpec with Matchers {
           i._4,
           i._5,
           i._6,
-          s"https://github.com/apache/openwhisk/issues/${i._2}"))
+          s"https://github.com/apache/openwhisk/issues/${i._2}",
+          "foo/bar"))
     RepoReport("openwhisk", issues, pulls)
   }
 }

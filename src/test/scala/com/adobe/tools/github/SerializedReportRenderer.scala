@@ -39,6 +39,6 @@ object SerializedReportRenderer extends App {
   val reports = json.convertTo[Seq[RepoReport]]
 
   val reportRenderer = new ReportRenderer()
-  val report = reportRenderer.render(reports, htmlMode = false)
+  val report = reportRenderer.render(reports, htmlMode = true)
   println(report)
 }

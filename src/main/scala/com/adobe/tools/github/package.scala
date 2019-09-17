@@ -24,17 +24,18 @@ package object github {
                    title: String,
                    isNew: Boolean,
                    open: Boolean,
-                   url: String) {
+                   url: String,
+                   repoFullName: String) {
     def isNewlyOpened: Boolean = isNew && open
     def isUpdate: Boolean = !isNew && open
     def isClosed: Boolean = !open
   }
 
   object Issue {
-    implicit val serdes = jsonFormat7(Issue.apply)
-    def apply(json: JsonObject, since: LocalDate): Issue = {
+    implicit val serdes = jsonFormat8(Issue.apply)
+    def apply(json: JsonObject, since: LocalDate, repoFullName: String): Issue = {
       val c = CommonAttr(json, since)
-      Issue(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, c.url)
+      Issue(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, c.url, repoFullName)
     }
   }
 
@@ -45,7 +46,8 @@ package object github {
                          isNew: Boolean,
                          open: Boolean,
                          merged: Boolean,
-                         url: String) {
+                         url: String,
+                         repoFullName: String) {
     def isNewlyOpened: Boolean = isNew && open
     def isUpdate: Boolean = !isNew && open
     def isClosed: Boolean = !open && !merged
@@ -53,10 +55,10 @@ package object github {
   }
 
   object PullRequest {
-    implicit val serdes = jsonFormat8(PullRequest.apply)
-    def apply(json: JsonObject, since: LocalDate, merged: Boolean): PullRequest = {
+    implicit val serdes = jsonFormat9(PullRequest.apply)
+    def apply(json: JsonObject, since: LocalDate, merged: Boolean, repoFullName: String): PullRequest = {
       val c = CommonAttr(json, since)
-      PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, merged, c.url)
+      PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, merged, c.url, repoFullName)
     }
 
     def isOpen(json: JsonObject): Boolean = json.getString("state") == "open"

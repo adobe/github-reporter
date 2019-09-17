@@ -43,14 +43,14 @@ case class GithubReporter(github: Github, config: GithubConfig) {
     issueItr.foreach { json =>
       if (isPull(json)) {
         val pr = if (PullRequest.isOpen(json)) {
-          PullRequest(json, since, merged = false)
+          PullRequest(json, since, merged = false, repoName)
         } else {
           //Get pull details to determine the merged state
-          PullRequest(json, since, merged = isMerged(json))
+          PullRequest(json, since, merged = isMerged(json), repoName)
         }
         pulls += pr
       } else {
-        issues += Issue(json, since)
+        issues += Issue(json, since, repoName)
       }
     }
     RepoReport(repoName, issues.toList, pulls.toList)
