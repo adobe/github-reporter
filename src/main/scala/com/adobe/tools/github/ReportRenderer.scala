@@ -20,6 +20,8 @@ import org.apache.commons.io.IOUtils
 import org.fusesource.scalate._
 import org.fusesource.scalate.support.StringTemplateSource
 import org.fusesource.scalate.util.{Resource, ResourceLoader}
+import spray.json._
+import spray.json.DefaultJsonProtocol._
 
 class ReportRenderer(template: String = "repo-report.ssp") {
   private val engine = {
@@ -36,6 +38,10 @@ class ReportRenderer(template: String = "repo-report.ssp") {
   def render(reports: Seq[RepoReport], htmlMode: Boolean): String = {
     val r = reports.map(render(_, htmlMode)).mkString("\n")
     if (htmlMode) mdToHtml(r) else r
+  }
+
+  def renderJson(reports: Seq[RepoReport]): String = {
+    reports.toJson.prettyPrint
   }
 
   def mdToHtml(report: String): String = {

@@ -15,6 +15,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import javax.json.JsonObject
+import spray.json.DefaultJsonProtocol._
 
 package object github {
   case class Issue(creator: String,
@@ -30,6 +31,7 @@ package object github {
   }
 
   object Issue {
+    implicit val serdes = jsonFormat7(Issue.apply)
     def apply(json: JsonObject, since: LocalDate): Issue = {
       val c = CommonAttr(json, since)
       Issue(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, c.url)
@@ -51,6 +53,7 @@ package object github {
   }
 
   object PullRequest {
+    implicit val serdes = jsonFormat8(PullRequest.apply)
     def apply(json: JsonObject, since: LocalDate): PullRequest = {
       val c = CommonAttr(json, since)
       PullRequest(c.creator, c.creatorUrl, c.id, c.title, c.isNew, c.open, json.getBoolean("merged"), c.url)
@@ -59,6 +62,10 @@ package object github {
 
   case class RepoReport(name: String, issues: List[Issue], pulls: List[PullRequest]) {
     def notEmpty: Boolean = issues.nonEmpty || pulls.nonEmpty
+  }
+
+  object RepoReport {
+    implicit val serdes = jsonFormat3(RepoReport.apply)
   }
 
   private def asDate(str: String): LocalDate = {

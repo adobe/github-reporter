@@ -67,6 +67,12 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
       required = false,
       noshort = true)
 
+  val jsonMode =
+    opt[Boolean](
+      descr = "Render in json mode. If enables then another report in json mode would also be rendered",
+      required = false,
+      noshort = true)
+
   dependsOnAll(repoPrefix, List(org))
   verify()
 }
@@ -92,6 +98,13 @@ object Main {
     val file = getOutputFile(conf)
     FileUtils.write(file, reportRenderer.render(reports, conf.htmlMode()), UTF_8)
     log.info(s"Report generated in $w")
+
+    if (conf.jsonMode()) {
+      val jsonFile = getFileWithExtension(file, "json")
+      FileUtils.write(jsonFile, reportRenderer.renderJson(reports), UTF_8)
+      log.info(s"Report written in json to ${jsonFile.getAbsolutePath}")
+    }
+
     log.info(s"Report written to ${file.getAbsolutePath}")
   }
 
@@ -114,8 +127,12 @@ object Main {
 
   def getOutputFile(conf: Conf): File = {
     val f = conf.out()
-    if (conf.htmlMode() && FilenameUtils.getExtension(f.getName) == "md") {
-      new File(f.getParentFile, FilenameUtils.removeExtension(f.getName) + ".html")
+    if (conf.htmlMode()) {
+      getFileWithExtension(f, "html")
     } else f
+  }
+
+  def getFileWithExtension(f: File, ext: String): File = {
+    new File(f.getParentFile, FilenameUtils.removeExtension(f.getName) + "." + ext)
   }
 }

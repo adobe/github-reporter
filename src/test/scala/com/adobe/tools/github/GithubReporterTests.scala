@@ -66,24 +66,6 @@ class GithubReporterTests extends FlatSpec with Matchers {
     println("-------")
   }
 
-  it should "get repo name" in {
-    val reportRenderer = new ReportRenderer()
-    val r =
-      reporter.collectRepoNames(Seq("apache/foo"), Some("apache"), Some("openwhisk"))
-    println("-------")
-    println(r.mkString("\n"))
-    println("-------")
-  }
-
-  it should "get repo info private" in {
-    val reporter = GithubReporter(GithubConfig(Some(token)).copy(uri = "https://git.corp.adobe.com/api/v3"))
-    val reportRenderer = new ReportRenderer()
-    val r = reporter.generateReport("adobe-apis/dcos-deploy", LocalDate.parse("2019-09-07"))
-    println("-------")
-    println(reportRenderer.render(r, true))
-    println("-------")
-  }
-
   it should "get repo info for all" in {
     val reportRenderer = new ReportRenderer()
     val reports = reporter.generateReport(repos, LocalDate.parse("2019-08-07"))

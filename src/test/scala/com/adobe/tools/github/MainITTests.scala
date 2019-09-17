@@ -22,15 +22,18 @@ import java.nio.charset.StandardCharsets.UTF_8
 
 import org.apache.commons.io.FileUtils
 import org.junit.runner.RunWith
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class MainITTests extends IntegrationTestBase {
+class MainITTests extends IntegrationTestBase with BeforeAndAfterEach {
   behavior of "MainIT"
 
+  private var tmpFile = File.createTempFile("greporter", null)
+
   it should "render markdown report" in {
-    val tmpFile = File.createTempFile("greporter", null)
-    val args = Array("-t", token, "--org", testOrg, "--since", creationDateStr, "--out", tmpFile.getAbsolutePath)
+    val args =
+      Array("-t", token, "--org", testOrg, "--since", creationDateStr, "--out", tmpFile.getAbsolutePath, "--json-mode")
     Main.main(args)
     val report = FileUtils.readFileToString(tmpFile, UTF_8)
     report should include("Create README-2.md")
@@ -39,6 +42,16 @@ class MainITTests extends IntegrationTestBase {
     println("-------")
     println(report)
     println("-------")
+
+    val jsonFile = Main.getFileWithExtension(tmpFile, "json")
+    val json = FileUtils.readFileToString(jsonFile, UTF_8)
+
+    println("-------")
+    println(json)
+    println("-------")
+
     FileUtils.forceDelete(tmpFile)
   }
+
+  override protected def afterEach(): Unit = { FileUtils.forceDelete(tmpFile) }
 }
