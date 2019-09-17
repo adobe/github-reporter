@@ -2,8 +2,8 @@
 <%@ val heading: String %>
 <%@ val htmlMode: Boolean %>
 <%
-    val H1 = "#"
-    val H3 = "#" * 3
+    val H = "#"
+    val H3 = if (htmlMode) "#" * 4 else "#" * 3
 %>
 #if (pulls.nonEmpty)
 ${H3} ${heading}:
@@ -11,8 +11,8 @@ ${H3} ${heading}:
     for (i <- pulls)
     if (htmlMode) {
 %>
-* ${i.title} [${H1}${i.id.toString}](${i.url}) ([${i.creator}](${i.creatorUrl}))
+* ${i.title} [${H}${i.id.toString}](${i.url}) ([${i.creator}](${i.creatorUrl}))
 <% } else {%>
-    * ${H1}${i.id.toString} - ${i.title} (${i.creator})
+    * ${H}${i.id.toString} - ${i.title} (${i.creator})
 <%}%>
 #end
