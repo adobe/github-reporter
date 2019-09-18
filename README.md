@@ -47,7 +47,7 @@ It supports multiple options
 2. Generate report for all repo in an org (via `--org apache --repo-prefix openwhisk`)
 3. Render markdown or html report (`--html-mode`)
 4. Pass access token for higher rate limits
-5. Send mail (TODO)
+5. Send mail
 
 ```
 $ java -jar build/libs/github-reporter-1.0-SNAPSHOT.jar -h
@@ -86,6 +86,32 @@ To generate report for last 5 days for all repos in a org https://github.com/apa
 ```bash
 $ java -jar github-reporter.jar --since "2 days" --org apache --repo-prefix openwhisk -t $GITHUB_TOKEN
 ```
+
+## Sending mails
+
+Tool supports sending mails also for which you would need to provide mail related options
+
+```
+java -jar build/libs/github-reporter-1.0-SNAPSHOT.jar \
+    --token <token>>  \
+    -Dmail.host=<smtp server> -Dmail.port=587 -Dmail.start-tls=true  \
+    -Dmail.from=sender@example.com -Dmail.to=receiver@example.com \
+    -Dmail.username=<username> -Dmail.password="<password>" \
+    --since 2019-09-11 \
+    --json-mode --html-mode \
+    --org github-reporter-test
+```
+
+Here
+
+* `mail.host` - SMTP host like `smtp.gmail.com` or `mail-relay.apache.org`
+* `mail.port` - SMTP port. Generally `587` for STARTTL and `465` for SSL
+* `mail.from` - Sender emailId
+* `mail.to` - Receiver emailId
+* `mail.username` - Username for the account used for authentication
+* `mail.password` - Password for the account used for authentication
+
+There are some other options which you can see from [reference.conf](src/main/resources/reference.conf) file
 
 ## Build
 
