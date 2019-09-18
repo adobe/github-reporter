@@ -73,6 +73,9 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
       required = false,
       noshort = true)
 
+  //TODO Improve help message here documenting required properties
+  val mailProps = props[String](descr = "Mailer related properties like -Dhost=mail-relay.apache.org")
+
   dependsOnAll(repoPrefix, List(org))
   verify()
 }
@@ -97,13 +100,20 @@ object Main {
 
     val reportRenderer = new ReportRenderer()
     val file = getOutputFile(conf)
-    FileUtils.write(file, reportRenderer.render(reports, conf.htmlMode()), UTF_8)
+    val report = reportRenderer.render(reports, conf.htmlMode())
+    FileUtils.write(file, report, UTF_8)
     log.info(s"Report generated in $w")
 
     if (conf.jsonMode()) {
       val jsonFile = getFileWithExtension(file, "json")
       FileUtils.write(jsonFile, reportRenderer.renderJson(reports), UTF_8)
       log.info(s"Report written in json to ${jsonFile.getAbsolutePath}")
+    }
+
+    if (conf.mailProps.nonEmpty) {
+      log.info("Sending report mail")
+      val mailer = Mailer(report, conf.htmlMode(), since, conf.mailProps)
+      mailer.send()
     }
 
     log.info(s"Report written to ${file.getAbsolutePath}")
