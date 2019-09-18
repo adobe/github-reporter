@@ -45,7 +45,8 @@ class PrecompileTask extends DefaultTask {
         log.info("targetDirectory: given[$targetDirectory], actual[$targetDirectorySpec]")
         log.info("workingDirectory: given[$workingDirectory], actual[$workingDirectorySpec]")
 
-        def classpathURLs = convertURL(project.files(project.configurations.compile, targetDirectorySpec))
+        def classpathURLs = convertURL(project.files(project.configurations.compile, targetDirectorySpec)
+            + project.files(project.configurations.compileOnly, targetDirectorySpec))
         def precompiler = loadPrecompiler(classpathURLs)
         precompiler.invokeMethod('sources_$eq', templateSrcDirSpec)
         precompiler.invokeMethod('workingDirectory_$eq', workingDirectorySpec)
