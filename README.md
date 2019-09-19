@@ -129,7 +129,7 @@ This tool is implemented in Scala and uses following libraries
 2. [scalate][4] - For report templates
 3. [flexmark-java][5] - For converting markdown to html
  
-[1]: https://git.corp.adobe.com/chetanm/github-reporter/releases/download/SNAPSHOT/github-reporter-1.0-SNAPSHOT.jar
+[1]: https://github.com/adobe/github-reporter/releases/download/SNAPSHOT/github-reporter-1.0-SNAPSHOT.jar
 [2]: https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line
 [3]: https://github.com/jcabi/jcabi-github
 [4]: https://scalate.github.io/scalate/
