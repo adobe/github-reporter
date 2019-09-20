@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) [![Actions Status](https://github.com/adobe/github-reporter/workflows/CI/badge.svg)](https://github.com/adobe/github-reporter/actions) 
+
 # Github Report Generator
 
 This tool enables generating change report for a set of github repositories. Such a report helps a team to get a high level
