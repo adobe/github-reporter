@@ -17,7 +17,7 @@ jobs:
       env:
         CI: "true"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./gradlew checkScalafmtAll reportScoverage build
+      run: ./gradlew checkScalafmtAll reportTestScoverage build
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.0.2
       with:
