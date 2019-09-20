@@ -17,13 +17,12 @@ jobs:
       env:
         CI: "true"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./gradlew checkScalafmtAll reportTestScoverage bootJar
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        ./gradlew checkScalafmtAll reportTestScoverage bootJar
+        curl -s https://codecov.io/bash | bash -s -- -t $CODECOV_TOKEN
     - name: Archive reporter jar
       uses: actions/upload-artifact@v1
       with:
         name: github-reporter
         path: build/libs/github-reporter-1.0.0-SNAPSHOT.jar
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1.0.2
-      with:
-        token: ${{secrets.CODECOV_TOKEN}}
