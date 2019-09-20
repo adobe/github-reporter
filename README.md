@@ -1,4 +1,7 @@
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) [![Actions Status](https://github.com/adobe/github-reporter/workflows/CI/badge.svg)](https://github.com/adobe/github-reporter/actions) 
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0) 
+[![Actions Status](https://github.com/adobe/github-reporter/workflows/CI/badge.svg)](https://github.com/adobe/github-reporter/actions)
+[![codecov](https://codecov.io/gh/adobe/github-reporter/branch/master/graph/badge.svg)](https://codecov.io/gh/adobe/github-reporter)
+ 
 
 # Github Report Generator
 
