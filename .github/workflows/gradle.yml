@@ -17,4 +17,4 @@ jobs:
       env:
         CI: "true"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: ./gradlew reportScoverage build
+      run: ./gradlew checkScalafmtAll reportScoverage build
