@@ -20,9 +20,9 @@ jobs:
       run: ./gradlew checkScalafmtAll reportTestScoverage bootJar
     - name: Archive reporter jar
       uses: actions/upload-artifact@v1
-        with:
-          name: github-reporter
-          path: build/libs/github-reporter-1.0.0-SNAPSHOT.jar
+      with:
+        name: github-reporter
+        path: build/libs/github-reporter-1.0.0-SNAPSHOT.jar
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1.0.2
       with:
