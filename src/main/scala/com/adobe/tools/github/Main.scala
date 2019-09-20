@@ -11,21 +11,27 @@ governing permissions and limitations under the License.
  */
 package com.adobe.tools.github
 
-import java.io.File
+import java.io.{ByteArrayInputStream, File}
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
+import java.util.Properties
 
 import com.google.common.base.Stopwatch
-import org.apache.commons.io.{FileUtils, FilenameUtils}
+import org.apache.commons.io.{FileUtils, FilenameUtils, IOUtils}
 import org.rogach.scallop.{singleArgConverter, ScallopConf}
 import org.slf4j.LoggerFactory
 
+import scala.collection.JavaConverters._
 import scala.concurrent.duration.Duration
 import scala.util.{Failure, Success, Try}
 
 class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
-  footer("\nGithub change reporter")
+  banner(
+    "Github Report Generator\n" +
+      "\tGenerates change report for set of github repos\n\n" +
+      "\t\t java -jar github-reporter.jar --since \"7 days\" adobe/github-reporter\n")
+  footer(s"\n${Main.commitInfo()}")
   this.printedName = "github"
 
   val token = opt[String](descr =
@@ -80,8 +86,12 @@ class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
   verify()
 }
 
+case class GitInfo(commitId: String, commitTime: String)
+
 object Main {
   private val log = LoggerFactory.getLogger("github-reporter")
+  val gitInfo: Option[GitInfo] = loadGitInfo()
+
   def main(args: Array[String]): Unit = {
     val w = Stopwatch.createStarted()
     val conf = new Conf(args)
@@ -145,5 +155,24 @@ object Main {
 
   def getFileWithExtension(f: File, ext: String): File = {
     new File(f.getParentFile, FilenameUtils.removeExtension(f.getName) + "." + ext)
+  }
+
+  def commitInfo(): String = gitInfo.map(g => s"\nGit Commit: ${g.commitId}, Build Date: ${g.commitTime}").getOrElse("")
+
+  private def loadGitInfo() = {
+    val info = loadPropResource("git.properties")
+    for {
+      commit <- info.get("git.commit.id.abbrev")
+      time <- info.get("git.commit.time")
+    } yield GitInfo(commit, time)
+  }
+
+  private def loadPropResource(name: String): Map[String, String] = {
+    Try {
+      val propString = IOUtils.resourceToString("/" + name, UTF_8)
+      val props = new Properties()
+      props.load(new ByteArrayInputStream(propString.getBytes(UTF_8)))
+      props.asScala.toMap
+    }.getOrElse(Map.empty)
   }
 }
