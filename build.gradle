@@ -31,7 +31,7 @@ plugins {
 apply plugin: ScalatePlugin
 
 group 'com.adobe'
-version '1.0.0-SNAPSHOT'
+version '0.1-beta'
 scalafmt.configFilePath = gradle.scalafmt.config
 project.archivesBaseName = "github-reporter"
 
