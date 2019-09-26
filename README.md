@@ -13,7 +13,8 @@ $ curl -L https://github.com/adobe/github-reporter/releases/download/v0.1-beta/g
 $ java -jar github-reporter.jar --since "2 days" apache/openwhisk 
 ```
 
-If you get an error like _"API rate limit exceeded"_ then you would need to configure a [personal access token][2] via `-t` option
+If you get an error like _"API rate limit exceeded"_ then you would need to configure a [personal access token][2] via `-t` option.
+See [rate limits][6] for detail. While creating the token you do not have to select any specific scope.
 
 Download the current snapshot release from [here][1]
 
@@ -116,3 +117,4 @@ This tool is implemented in Scala and uses following libraries
 [3]: https://github.com/jcabi/jcabi-github
 [4]: https://scalate.github.io/scalate/
 [5]: https://github.com/vsch/flexmark-java
+[6]: https://developer.github.com/v3/#rate-limiting
